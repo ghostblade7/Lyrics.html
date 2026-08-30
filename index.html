@@ -468,9 +468,12 @@ async function loadLyrics(song){
  }
 }
 
-async function openSong(index){
+async function openSong(index,push=true){
  const song=results[index];if(!song)return;
  current=song;
+  if(push && !navigationBusy){
+    pushAppState("song",{index});
+  }
  const h=store(KEYS.hist).filter(x=>x.id!==song.id);h.unshift(song);put(KEYS.hist,h);
 
  $("homePanels").style.display="none";
@@ -499,21 +502,77 @@ function playPreview(){
  $("audio").play().catch(()=>{});
 }
 
-function showHome(){
- stopSync();$("view").style.display="none";$("results").style.display="none";
- $("homePanels").style.display="grid";renderHome();
+
+let navigationBusy=false;
+
+function pushAppState(page, extra={}){
+  if(navigationBusy)return;
+  history.pushState(
+    {songsWorld:true,page,...extra},
+    "",
+    location.href
+  );
+}
+
+function replaceAppState(page, extra={}){
+  history.replaceState(
+    {songsWorld:true,page,...extra},
+    "",
+    location.href
+  );
+}
+
+function restoreAppState(state){
+  if(!state?.songsWorld){
+    showHome(false);
+    return;
+  }
+
+  if(state.page==="song" && Number.isInteger(state.index) && results[state.index]){
+    openSong(state.index,false);
+    return;
+  }
+
+  if(state.page==="results"){
+    showResults(false);
+    return;
+  }
+
+  showHome(false);
+}
+
+window.addEventListener("popstate",event=>{
+  navigationBusy=true;
+  try{restoreAppState(event.state)}
+  finally{setTimeout(()=>navigationBusy=false,0)}
+});
+
+if(!history.state?.songsWorld){
+  replaceAppState("home");
+}
+
+function showHome(push=true){
+  stopSync();
+  $("view").style.display="none";
+  $("results").style.display="none";
+  $("homePanels").style.display="grid";
+  renderHome();
+  if(push)pushAppState("home");
 }
 
 $("go").onclick=async()=>{
  const q=$("q").value.trim();if(!q)return;
  $("go").textContent="SEARCHING…";
- try{results=await search(q);render()}
+ try{results=await search(q);render();if(!navigationBusy)pushAppState("results")}
  catch(e){console.error(e);$("homePanels").style.display="none";$("results").style.display="block";$("list").innerHTML='<div class="empty">Search failed. Please try again.</div>'}
  finally{$("go").textContent="SEARCH ✦"}
 };
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter")$("go").click()});
-$("back").onclick=()=>{stopSync();$("view").style.display="none";$("results").style.display="block";render()};
-$("homeBtn").onclick=showHome;
+$("back").onclick=()=>{
+  if(history.state?.songsWorld)history.back();
+  else showResults();
+};$("view").style.display="none";$("results").style.display="block";render()};
+$("homeBtn").onclick=()=>showHome(true);
 $("trendBtn").onclick=()=>{showHome();document.querySelector(".section.full")?.scrollIntoView({behavior:"smooth"})};
 $("libBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[1]?.scrollIntoView({behavior:"smooth"})};
 $("histBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[2]?.scrollIntoView({behavior:"smooth"})};
