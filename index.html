@@ -16,7 +16,1423 @@
 <main class="content"><div id="homePanels" class="homegrid"><section class="section full"><div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending now</h2></div><span class="muted" id="trendStatus">Loading…</span></div><div class="cards" id="trending"></div></section><section class="section"><div class="sectionhead"><h2>♡ My Library</h2></div><div class="cards" id="library"></div></section><section class="section"><div class="sectionhead"><h2>◷ Recent</h2></div><div class="cards" id="history"></div></section></div><section class="results" id="results"><div class="head"><div><div class="eyebrow">Search results</div><h2>Pick your track</h2></div><span class="muted" id="count"></span></div><div class="list" id="list"></div></section><section class="view" id="view"><button class="back" id="back">← Back</button><div class="grid"><aside class="card song"><div class="cover"><img id="art" alt="Album art"><div class="disc" id="disc"></div></div><h3 id="title">Song</h3><div class="artist" id="artist">Artist</div><div class="status" id="status">Ready</div><div class="actions"><button class="primary" id="play">▶ Play preview</button><button id="save">♡ Save</button></div></aside><article class="card lyrics"><div class="lyricshead"><div><div class="eyebrow">The words</div><h2>Lyrics</h2></div><div class="options"><span>SHOW AS</span><select id="mode"><option value="original">Original</option><option value="roman">English letters</option></select></div></div><div class="tools"><button class="sync" id="sync">SYNC ↺</button></div><div class="lyricsbox" id="lyrics"><div class="empty">Select a song.</div></div><div class="video"><div class="videohead"><span>▶ YOUTUBE</span><span id="ytname">SEARCHING…</span></div><div class="videobody"><iframe id="ytFrame" title="YouTube player" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><div class="videoprompt" id="videoprompt"><div><div class="vicon">▶</div><b id="ytTitle">Finding a playable video…</b><small id="ytArtist">Please wait</small><a class="watch" id="ytLink" target="_blank" rel="noopener">OPEN YOUTUBE ↗</a></div></div></div></div></article></div></section></main>
 <div class="audio" id="audioBar"><img id="aicon"><div class="audioinfo"><b id="aname">Song</b><small id="aartist">Artist</small></div><audio id="audio" controls preload="metadata"></audio><button class="closeaudio" id="closeaudio">×</button></div><div class="modal" id="modal"><div class="modalbox"><div class="eyebrow">Welcome to Songs World</div><h2>Sign in</h2><p class="muted">Google sign-in needs your OAuth Client ID. Your Library and History already work on this device without an account.</p><button class="google" id="google">Continue with Google</button><button class="close" id="close">Close</button></div></div>
 <script>
-const $=id=>document.getElementById(id),WORKER='https://songsworld.khalidhasanmolla38.workers.dev';let results=[],current=null,lyricsData=null,lines=[],timer=null,mode='original',cache=new Map();const KEYS={lib:'sw_library_v2',hist:'sw_history_v2'};const norm=s=>String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9\u0900-\u097f\u0980-\u09ff]+/g,' ').trim();const esc=s=>String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));async function api(u){const r=await fetch(u);if(!r.ok)throw Error('Request failed');return r.json()}function store(k){try{return JSON.parse(localStorage.getItem(k)||'[]')}catch{return[]}}function put(k,v){try{localStorage.setItem(k,JSON.stringify(v.slice(0,30)))}catch{}}function remember(song){let a=store(KEYS.hist).filter(x=>x.id!==song.id);a.unshift(song);put(KEYS.hist,a);renderHome()}function saveSong(song){let a=store(KEYS.lib).filter(x=>x.id!==song.id);a.unshift(song);put(KEYS.lib,a);renderHome()}function mini(x){return `<button class="mini" data-song='${esc(JSON.stringify(x))}'><img src="${esc(x.art||'')}" onerror="this.style.opacity=.15"><b>${esc(x.trackName)}</b><small>${esc(x.artistName)}</small></button>`}function renderHome(){const lib=store(KEYS.lib),hist=store(KEYS.hist);$('library').innerHTML=lib.length?lib.slice(0,4).map(mini).join(''):'<div class="muted">Save songs and they will appear here.</div>';$('history').innerHTML=hist.length?hist.slice(0,4).map(mini).join(''):'<div class="muted">Songs you open will appear here.</div>';document.querySelectorAll('.mini').forEach(b=>b.onclick=()=>{current=JSON.parse(b.dataset.song);results=[current];openSong(0)})}async function loadTrending(){try{const d=await api('https://itunes.apple.com/in/rss/topsongs/limit=12/json');const arr=(d.feed?.entry||[]).map(x=>({id:x.id?.attributes?.['im:id']||x.id?.label,trackName:x['im:name']?.label||'',artistName:x['im:artist']?.label||'',albumName:x['im:collection']?.['im:name']?.label||'',art:(x['im:image']?.[2]?.label||x['im:image']?.[0]?.label||'').replace(/170x170/,'600x600'),previewUrl:''})).filter(x=>x.trackName&&x.artistName);$('trending').innerHTML=arr.map(mini).join('');$('trendStatus').textContent='India • Top songs';document.querySelectorAll('#trending .mini').forEach(b=>b.onclick=()=>{current=JSON.parse(b.dataset.song);results=[current];openSong(0)})}catch(e){const h=store(KEYS.hist);$('trending').innerHTML=h.length?h.slice(0,8).map(mini).join(''):'<div class="muted">Trending is temporarily unavailable.</div>';$('trendStatus').textContent='Offline fallback'}}function showHome(){stopSync();$('view').style.display='none';$('results').style.display='none';$('homePanels').style.display='grid';renderHome()}function showSection(which){showHome();$('homePanels').querySelectorAll('.section').forEach(s=>s.style.display='none');const map={trend:0,lib:1,hist:2};const s=$('homePanels').querySelectorAll('.section')[map[which]];if(s)s.style.display='block'}function score(x,q){const t=norm(x.trackName),a=norm(x.artistName),n=norm(q);return(t===n?1200:0)+(t.startsWith(n)?700:0)+(t.includes(n)?350:0)+(a.includes(n)?250:0)}async function search(q){q=q.trim();if(!q) return[];if(cache.has(q))return cache.get(q);const d=await api('https://itunes.apple.com/search?term='+encodeURIComponent(q)+'&country=IN&media=music&entity=song&limit=30');const seen=new Set(),out=(d.results||[]).filter(x=>x.trackName&&x.artistName).map(x=>({id:x.trackId,trackName:x.trackName,artistName:x.artistName,albumName:x.collectionName||'',art:(x.artworkUrl100||'').replace(/100x100/,'600x600'),duration:x.trackTimeMillis?x.trackTimeMillis/1000:0,previewUrl:x.previewUrl||''})).filter(x=>{const k=norm(x.trackName)+'|'+norm(x.artistName);if(seen.has(k))return false;seen.add(k);return true}).sort((a,b)=>score(b,q)-score(a,q));cache.set(q,out);return out}function render(){if(!results.length){$('list').innerHTML='<div class="empty">No songs found.</div>';return}$('list').innerHTML=results.map((x,i)=>`<button class="item" data-i="${i}"><img class="thumb" src="${esc(x.art)}" onerror="this.style.visibility='hidden'"><span><strong class="songname">${esc(x.trackName)}</strong><small class="meta">${esc(x.artistName)} · ${esc(x.albumName||'Single')}</small></span><span class="arrow">›</span></button>`).join('');$('count').textContent=results.length+' matches';document.querySelectorAll('.item').forEach(b=>b.onclick=()=>openSong(+b.dataset.i))}function parseLrc(t){return String(t||'').split(/\r?\n/).flatMap(line=>{const ms=[...line.matchAll(/\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/g)],text=line.replace(/\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g,'').trim();return ms.map(m=>({time:+m[1]*60+ +m[2]+(m[3]?+('0.'+m[3]):0),text}))}).filter(x=>x.text).sort((a,b)=>a.time-b.time)}function clean(t){return String(t||'').replace(/\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g,'').replace(/^\[(?:ar|ti|al|by|offset|re|ve):.*?\]$/gim,'').trim()}const dev={'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ए':'e','ऐ':'ai','ओ':'o','औ':'au','ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','े':'e','ै':'ai','ो':'o','ौ':'au','ं':'n','ः':'h','ँ':'n','़':'','्':'','क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'ng','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'ny','ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n','प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v','श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l'};function roman(t){return String(t).split(/\r?\n/).map(line=>[...line].map(c=>dev[c]??c).join('')).join('\n')}function renderLyrics(){if(!lyricsData)return;const source=clean(lyricsData.plainLyrics||lyricsData.syncedLyrics);if(mode==='roman'){$('lyrics').innerHTML='<div class="plain">'+esc(/[\u0900-\u097f\u0980-\u09ff]/.test(source)?roman(source):source).replace(/\n/g,'<br>')+'</div>';stopSync();return}if(lyricsData.syncedLyrics){lines=parseLrc(lyricsData.syncedLyrics);$('lyrics').innerHTML=lines.map((l,i)=>`<button class="line" data-i="${i}">${esc(l.text)}</button>`).join('');document.querySelectorAll('.line').forEach(b=>b.onclick=()=>highlight(+b.dataset.i,true));startSync()}else{$('lyrics').innerHTML='<div class="plain">'+esc(source).replace(/\n/g,'<br>')+'</div>';stopSync()}}function highlight(i,scroll){document.querySelectorAll('.line').forEach((e,n)=>e.classList.toggle('current',n===i));const e=document.querySelector('.line[data-i="'+i+'"]');if(e&&scroll)e.scrollIntoView({behavior:'smooth',block:'center'})}function startSync(){stopSync();if(!lines.length)return;updateLyricsFromPlayer();timer=setInterval(updateLyricsFromPlayer,80)}function stopSync(){if(timer){clearInterval(timer);timer=null}}function getYouTubePlayer(){const player=window.songsworldYTPlayer;if(!player||typeof player.getCurrentTime!=='function')return null;return player}function updateLyricsFromPlayer(){const player=getYouTubePlayer();if(!player||!lines.length)return;let state=-1,time=0;try{state=typeof player.getPlayerState==='function'?player.getPlayerState():-1;time=Number(player.getCurrentTime?.()||0)}catch(e){return}if(state!==1&&state!==2&&state!==0)return;let lo=0,hi=lines.length-1,active=-1;while(lo<=hi){const mid=(lo+hi)>>1;if(lines[mid].time<=time){active=mid;lo=mid+1}else hi=mid-1}if(active>=0)highlight(active,false)}function seekYouTubeTo(seconds){const player=getYouTubePlayer();if(!player)return;try{player.seekTo(Math.max(0,Number(seconds)||0),true);player.playVideo?.();startSync()}catch(e){}}function loadYouTubeAPI(){if(window.YT&&window.YT.Player){createYouTubePlayer();return}if(document.getElementById('youtube-iframe-api'))return;const script=document.createElement('script');script.id='youtube-iframe-api';script.src='https://www.youtube.com/iframe_api';script.async=true;document.head.appendChild(script)}window.onYouTubeIframeAPIReady=()=>createYouTubePlayer();function createYouTubePlayer(){const frame=document.getElementById('youtubePlayer');if(!frame||!window.YT||!window.YT.Player||!frame.classList.contains('ready'))return;try{window.songsworldYTPlayer?.destroy?.()}catch(e){}window.songsworldYTPlayer=null;try{window.songsworldYTPlayer=new YT.Player(frame,{events:{onReady:()=>{updateLyricsFromPlayer();if(lines.length)startSync()},onStateChange:(event)=>{if(event.data===1)startSync();else if(event.data===2){updateLyricsFromPlayer();stopSync()}else if(event.data===0){updateLyricsFromPlayer();stopSync()}},onError:()=>{stopSync()}},playerVars:{playsinline:1,rel:0,modestbranding:1,enablejsapi:1}})}catch(e){window.songsworldYTPlayer=null}}function prepareYouTubeForSync(){loadYouTubeAPI()}function cleanSyncedLyrics(lrc){return String(lrc||'').replace(/\[(?:\d{1,3}:)?\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g,'').replace(/^\[(?:ar|ti|al|by|offset|re|ve):.*?\]\s*$/gim,'').split(/\\r?\\n/).map(line=>line.trim()).filter((line,i,arr)=>line||(i>0&&arr[i-1])).join('\n').trim()}function stripLrc(lrc){return cleanSyncedLyrics(lrc)}input.addEventListener('input',()=>showSuggestions(input.value));input.addEventListener('focus',()=>{if(input.value.trim())showSuggestions(input.value)});document.addEventListener('click',e=>{if(!e.target.closest('.search-wrap'))hideSuggestions()});document.getElementById('syncNow')?.addEventListener('click',()=>{userLyricsScroll=false;updateLyricsFromPlayer()});document.getElementById('lyricsLanguage')?.addEventListener('change',async e=>{selectedLyricsMode=e.target.value;if(currentLyricsData)renderLyricsInSelectedLanguage(currentLyricsData)});lyricsEl.addEventListener('scroll',()=>{userLyricsScroll=true;clearTimeout(window._lyricsScrollTimer);window._lyricsScrollTimer=setTimeout(()=>{userLyricsScroll=false},1800)});form.addEventListener('submit',e=>{e.preventDefault();const q=input.value.trim();if(q)searchSong(q)});
+const $ = id => document.getElementById(id);
+
+const WORKER =
+  "https://songsworld.khalidhasanmolla38.workers.dev";
+
+let results = [];
+let current = null;
+let lyricsData = null;
+let lines = [];
+let syncTimer = null;
+let mode = "original";
+let ytPlayer = null;
+let ytVideoId = null;
+let previewAudio = null;
+
+const KEYS = {
+  lib: "sw_library_v2",
+  hist: "sw_history_v2"
+};
+
+// ================================
+// HELPERS
+// ================================
+
+function esc(s) {
+  return String(s || "").replace(/[&<>"']/g, c => ({
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;"
+  }[c]));
+}
+
+function norm(s) {
+  return String(s || "")
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9\u0900-\u097f\u0980-\u09ff]+/g, " ")
+    .trim();
+}
+
+function store(key) {
+  try {
+    return JSON.parse(localStorage.getItem(key) || "[]");
+  } catch {
+    return [];
+  }
+}
+
+function put(key, value) {
+  try {
+    localStorage.setItem(
+      key,
+      JSON.stringify(value.slice(0, 30))
+    );
+  } catch {}
+}
+
+async function api(url) {
+  const response = await fetch(url, {
+    headers: {
+      "Accept": "application/json"
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(
+      "Request failed: " + response.status
+    );
+  }
+
+  return response.json();
+}
+
+// ================================
+// HOME / LIBRARY / HISTORY
+// ================================
+
+function mini(song) {
+  return `
+    <button class="mini"
+      data-song="${esc(JSON.stringify(song))}">
+      <img
+        src="${esc(song.art || "")}"
+        onerror="this.style.opacity=.15"
+      >
+      <b>${esc(song.trackName)}</b>
+      <small>${esc(song.artistName)}</small>
+    </button>
+  `;
+}
+
+function renderHome() {
+  const library = store(KEYS.lib);
+  const history = store(KEYS.hist);
+
+  $("library").innerHTML =
+    library.length
+      ? library.slice(0, 4).map(mini).join("")
+      : '<div class="muted">Save songs and they will appear here.</div>';
+
+  $("history").innerHTML =
+    history.length
+      ? history.slice(0, 4).map(mini).join("")
+      : '<div class="muted">Songs you open will appear here.</div>';
+
+  document.querySelectorAll(".mini").forEach(button => {
+    button.onclick = () => {
+      try {
+        const song =
+          JSON.parse(button.dataset.song);
+
+        results = [song];
+        openSong(0);
+      } catch {}
+    };
+  });
+}
+
+function remember(song) {
+  const history =
+    store(KEYS.hist)
+      .filter(x => x.id !== song.id);
+
+  history.unshift(song);
+  put(KEYS.hist, history);
+}
+
+function saveSong(song) {
+  const library =
+    store(KEYS.lib)
+      .filter(x => x.id !== song.id);
+
+  library.unshift(song);
+  put(KEYS.lib, library);
+  renderHome();
+}
+
+// ================================
+// TRENDING
+// ================================
+
+async function loadTrending() {
+  try {
+    const data = await api(
+      "https://itunes.apple.com/in/rss/topsongs/limit=12/json"
+    );
+
+    const songs =
+      (data.feed?.entry || [])
+        .map(x => ({
+          id:
+            x.id?.attributes?.["im:id"] ||
+            x.id?.label ||
+            Math.random(),
+
+          trackName:
+            x["im:name"]?.label || "",
+
+          artistName:
+            x["im:artist"]?.label || "",
+
+          albumName:
+            x["im:collection"]?.["im:name"] ||
+            "",
+
+          art:
+            (
+              x["im:image"]?.[2]?.label ||
+              x["im:image"]?.[0]?.label ||
+              ""
+            ).replace(/170x170/g, "600x600"),
+
+          previewUrl: "",
+          duration: 0
+        }))
+        .filter(x =>
+          x.trackName &&
+          x.artistName
+        );
+
+    $("trending").innerHTML =
+      songs.map(mini).join("");
+
+    $("trendStatus").textContent =
+      "India • Top songs";
+
+    document
+      .querySelectorAll("#trending .mini")
+      .forEach(button => {
+        button.onclick = () => {
+          try {
+            const song =
+              JSON.parse(button.dataset.song);
+
+            results = [song];
+            openSong(0);
+          } catch {}
+        };
+      });
+
+  } catch {
+    const history = store(KEYS.hist);
+
+    $("trending").innerHTML =
+      history.length
+        ? history.slice(0, 8).map(mini).join("")
+        : '<div class="muted">Trending is temporarily unavailable.</div>';
+
+    $("trendStatus").textContent =
+      "Offline fallback";
+
+    renderHome();
+  }
+}
+
+// ================================
+// SEARCH
+// ================================
+
+function score(song, query) {
+  const title = norm(song.trackName);
+  const artist = norm(song.artistName);
+  const q = norm(query);
+
+  return (
+    (title === q ? 1200 : 0) +
+    (title.startsWith(q) ? 700 : 0) +
+    (title.includes(q) ? 350 : 0) +
+    (artist.includes(q) ? 250 : 0)
+  );
+}
+
+async function searchSongs(query) {
+  query = query.trim();
+
+  if (!query) return [];
+
+  const url =
+    "https://itunes.apple.com/search?" +
+    new URLSearchParams({
+      term: query,
+      country: "IN",
+      media: "music",
+      entity: "song",
+      limit: "30"
+    });
+
+  const data = await api(url);
+
+  const seen = new Set();
+
+  return (data.results || [])
+    .filter(x =>
+      x.trackName &&
+      x.artistName
+    )
+    .map(x => ({
+      id: x.trackId,
+
+      trackName:
+        x.trackName,
+
+      artistName:
+        x.artistName,
+
+      albumName:
+        x.collectionName || "",
+
+      art:
+        (x.artworkUrl100 || "")
+          .replace(/100x100/g, "600x600"),
+
+      duration:
+        x.trackTimeMillis
+          ? x.trackTimeMillis / 1000
+          : 0,
+
+      previewUrl:
+        x.previewUrl || ""
+    }))
+    .filter(song => {
+      const key =
+        norm(song.trackName) +
+        "|" +
+        norm(song.artistName);
+
+      if (seen.has(key))
+        return false;
+
+      seen.add(key);
+      return true;
+    })
+    .sort(
+      (a, b) =>
+        score(b, query) -
+        score(a, query)
+    );
+}
+
+function renderResults() {
+  $("homePanels").style.display = "none";
+  $("view").style.display = "none";
+  $("results").style.display = "block";
+
+  if (!results.length) {
+    $("list").innerHTML =
+      '<div class="empty">No songs found.</div>';
+
+    $("count").textContent = "";
+    return;
+  }
+
+  $("list").innerHTML =
+    results.map((song, index) => `
+      <button
+        class="item"
+        data-i="${index}"
+      >
+        <img
+          class="thumb"
+          src="${esc(song.art)}"
+          onerror="this.style.visibility='hidden'"
+        >
+
+        <span>
+          <strong class="songname">
+            ${esc(song.trackName)}
+          </strong>
+
+          <small class="meta">
+            ${esc(song.artistName)}
+            ·
+            ${esc(song.albumName || "Single")}
+          </small>
+        </span>
+
+        <span class="arrow">›</span>
+      </button>
+    `).join("");
+
+  $("count").textContent =
+    results.length + " matches";
+
+  document.querySelectorAll(".item")
+    .forEach(button => {
+      button.onclick = () =>
+        openSong(Number(button.dataset.i));
+    });
+}
+
+// ================================
+// LRC PARSER
+// ================================
+
+function parseLrc(text) {
+  return String(text || "")
+    .split(/\r?\n/)
+    .flatMap(line => {
+
+      const matches = [
+        ...line.matchAll(
+          /\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/g
+        )
+      ];
+
+      const lyricText =
+        line
+          .replace(
+            /\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g,
+            ""
+          )
+          .trim();
+
+      return matches.map(match => {
+
+        const minutes =
+          Number(match[1]);
+
+        const seconds =
+          Number(match[2]);
+
+        let fraction = 0;
+
+        if (match[3]) {
+          const digits =
+            match[3].length;
+
+          fraction =
+            Number(match[3]) /
+            Math.pow(10, digits);
+        }
+
+        return {
+          time:
+            minutes * 60 +
+            seconds +
+            fraction,
+
+          text:
+            lyricText
+        };
+      });
+    })
+    .filter(x => x.text)
+    .sort(
+      (a, b) =>
+        a.time - b.time
+    );
+}
+
+function cleanLyrics(text) {
+  return String(text || "")
+    .replace(
+      /\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g,
+      ""
+    )
+    .replace(
+      /^\[(?:ar|ti|al|by|offset|re|ve):.*?\]$/gim,
+      ""
+    )
+    .trim();
+}
+
+// ================================
+// DEVANAGARI ROMANIZATION
+// ================================
+
+const dev = {
+  "अ":"a",
+  "आ":"aa",
+  "इ":"i",
+  "ई":"ee",
+  "उ":"u",
+  "ऊ":"oo",
+  "ए":"e",
+  "ऐ":"ai",
+  "ओ":"o",
+  "औ":"au",
+  "ा":"aa",
+  "ि":"i",
+  "ी":"ee",
+  "ु":"u",
+  "ू":"oo",
+  "े":"e",
+  "ै":"ai",
+  "ो":"o",
+  "ौ":"au",
+  "ं":"n",
+  "ः":"h",
+  "ँ":"n",
+  "़":"",
+  "्":"",
+
+  "क":"k",
+  "ख":"kh",
+  "ग":"g",
+  "घ":"gh",
+  "ङ":"ng",
+  "च":"ch",
+  "छ":"chh",
+  "ज":"j",
+  "झ":"jh",
+  "ञ":"ny",
+  "ट":"t",
+  "ठ":"th",
+  "ड":"d",
+  "ढ":"dh",
+  "ण":"n",
+  "त":"t",
+  "थ":"th",
+  "द":"d",
+  "ध":"dh",
+  "न":"n",
+  "प":"p",
+  "फ":"ph",
+  "ब":"b",
+  "भ":"bh",
+  "म":"m",
+  "य":"y",
+  "र":"r",
+  "ल":"l",
+  "व":"v",
+  "श":"sh",
+  "ष":"sh",
+  "स":"s",
+  "ह":"h",
+  "ळ":"l"
+};
+
+function roman(text) {
+  return String(text || "")
+    .split(/\r?\n/)
+    .map(line =>
+      [...line]
+        .map(char =>
+          dev[char] ?? char
+        )
+        .join("")
+    )
+    .join("\n");
+}
+
+// ================================
+// LYRICS RENDER
+// ================================
+
+function renderLyrics() {
+
+  stopSync();
+
+  if (!lyricsData) {
+    $("lyrics").innerHTML =
+      '<div class="empty">Lyrics unavailable.</div>';
+
+    return;
+  }
+
+  const synced =
+    lyricsData.syncedLyrics || "";
+
+  const plain =
+    lyricsData.plainLyrics || "";
+
+  // --------------------------------
+  // ROMAN MODE
+  // --------------------------------
+
+  if (mode === "roman") {
+
+    const source =
+      cleanLyrics(
+        synced || plain
+      );
+
+    const converted =
+      /[\u0900-\u097f]/.test(source) ||
+      /[\u0980-\u09ff]/.test(source)
+        ? roman(source)
+        : source;
+
+    $("lyrics").innerHTML =
+      '<div class="plain">' +
+      esc(converted)
+        .replace(/\n/g, "<br>") +
+      "</div>";
+
+    return;
+  }
+
+  // --------------------------------
+  // SYNCED LYRICS
+  // --------------------------------
+
+  if (synced.trim()) {
+
+    lines =
+      parseLrc(synced);
+
+    if (!lines.length) {
+      $("lyrics").innerHTML =
+        '<div class="empty">Lyrics found, but timestamps are unavailable.</div>';
+
+      return;
+    }
+
+    $("lyrics").innerHTML =
+      lines.map((line, index) => `
+        <button
+          class="line"
+          data-i="${index}"
+        >
+          ${esc(line.text)}
+        </button>
+      `).join("");
+
+    document
+      .querySelectorAll(".line")
+      .forEach(button => {
+
+        button.onclick = () => {
+
+          const index =
+            Number(button.dataset.i);
+
+          if (lines[index]) {
+            seekYouTubeTo(
+              lines[index].time
+            );
+          }
+        };
+      });
+
+    startSync();
+
+    return;
+  }
+
+  // --------------------------------
+  // PLAIN LYRICS
+  // --------------------------------
+
+  const source =
+    cleanLyrics(plain);
+
+  $("lyrics").innerHTML =
+    source
+      ? '<div class="plain">' +
+        esc(source)
+          .replace(/\n/g, "<br>") +
+        "</div>"
+      : '<div class="empty">Lyrics unavailable.</div>';
+}
+
+// ================================
+// YOUTUBE PLAYER
+// ================================
+
+function loadYouTubeAPI() {
+
+  if (
+    window.YT &&
+    window.YT.Player
+  ) {
+    createYouTubePlayer();
+    return;
+  }
+
+  if (
+    document.getElementById(
+      "youtube-iframe-api"
+    )
+  ) {
+    return;
+  }
+
+  const script =
+    document.createElement("script");
+
+  script.id =
+    "youtube-iframe-api";
+
+  script.src =
+    "https://www.youtube.com/iframe_api";
+
+  script.async = true;
+
+  document.head.appendChild(script);
+}
+
+window.onYouTubeIframeAPIReady =
+  function() {
+    createYouTubePlayer();
+  };
+
+function createYouTubePlayer() {
+
+  const iframe =
+    $("ytFrame");
+
+  if (!iframe) return;
+
+  if (
+    !window.YT ||
+    !window.YT.Player
+  ) {
+    return;
+  }
+
+  try {
+    if (ytPlayer) {
+      ytPlayer.destroy();
+    }
+  } catch {}
+
+  ytPlayer = null;
+
+  try {
+
+    ytPlayer =
+      new YT.Player(
+        iframe,
+        {
+          events: {
+
+            onReady: function() {
+              updateLyricsFromYouTube();
+
+              if (lines.length) {
+                startSync();
+              }
+            },
+
+            onStateChange:
+              function(event) {
+
+                // PLAYING
+                if (event.data === 1) {
+                  startSync();
+                }
+
+                // PAUSED
+                else if (event.data === 2) {
+                  updateLyricsFromYouTube();
+                  stopSync();
+                }
+
+                // ENDED
+                else if (event.data === 0) {
+                  updateLyricsFromYouTube();
+                  stopSync();
+                }
+              },
+
+            onError:
+              function() {
+                stopSync();
+              }
+          },
+
+          playerVars: {
+            playsinline: 1,
+            rel: 0,
+            modestbranding: 1,
+            enablejsapi: 1
+          }
+        }
+      );
+
+  } catch {
+    ytPlayer = null;
+  }
+}
+
+// ================================
+// YOUTUBE SEARCH
+// ================================
+
+async function loadYouTube(song) {
+
+  stopSync();
+
+  ytPlayer = null;
+  ytVideoId = null;
+
+  $("ytname").textContent =
+    "SEARCHING…";
+
+  $("ytTitle").textContent =
+    "Finding a playable video…";
+
+  $("ytArtist").textContent =
+    "Please wait";
+
+  $("videoprompt")
+    .classList.remove("hidden");
+
+  $("ytFrame").src =
+    "about:blank";
+
+  $("ytLink").href =
+    "https://www.youtube.com/results?search_query=" +
+    encodeURIComponent(
+      song.trackName +
+      " " +
+      song.artistName
+    );
+
+  try {
+
+    const query =
+      song.trackName +
+      " " +
+      song.artistName +
+      " official";
+
+    const data =
+      await api(
+        WORKER +
+        "/api/youtube?" +
+        new URLSearchParams({
+          q: query
+        })
+      );
+
+    const videos =
+      (data.videos || [])
+        .filter(video =>
+          video &&
+          video.videoId
+        );
+
+    if (!videos.length) {
+      throw new Error(
+        "No YouTube videos"
+      );
+    }
+
+    // Prefer verified embeddable video
+    const video =
+      videos.find(v =>
+        v.embeddable === true
+      ) ||
+      videos[0];
+
+    ytVideoId =
+      video.videoId;
+
+    $("ytname").textContent =
+      video.channel ||
+      "YouTube";
+
+    $("ytTitle").textContent =
+      video.title ||
+      song.trackName;
+
+    $("ytArtist").textContent =
+      video.channel ||
+      song.artistName;
+
+    $("ytLink").href =
+      video.watchUrl ||
+      (
+        "https://www.youtube.com/watch?v=" +
+        video.videoId
+      );
+
+    // Important:
+    // enablejsapi allows the YouTube IFrame
+    // API to read currentTime.
+
+    $("ytFrame").src =
+      "https://www.youtube.com/embed/" +
+      encodeURIComponent(video.videoId) +
+      "?enablejsapi=1" +
+      "&playsinline=1" +
+      "&rel=0" +
+      "&modestbranding=1" +
+      "&origin=" +
+      encodeURIComponent(
+        location.origin
+      );
+
+    $("videoprompt")
+      .classList.add("hidden");
+
+    loadYouTubeAPI();
+
+    // API script can already exist.
+    setTimeout(() => {
+      createYouTubePlayer();
+    }, 700);
+
+  } catch (error) {
+
+    console.error(
+      "YouTube error:",
+      error
+    );
+
+    $("ytname").textContent =
+      "UNAVAILABLE";
+
+    $("ytTitle").textContent =
+      "YouTube video unavailable";
+
+    $("ytArtist").textContent =
+      "Try Open YouTube";
+
+    $("videoprompt")
+      .classList.remove("hidden");
+  }
+}
+
+// ================================
+// LYRICS ↔ YOUTUBE SYNC
+// ================================
+
+function startSync() {
+
+  stopSync();
+
+  if (!lines.length)
+    return;
+
+  updateLyricsFromYouTube();
+
+  syncTimer =
+    setInterval(
+      updateLyricsFromYouTube,
+      100
+    );
+}
+
+function stopSync() {
+
+  if (syncTimer) {
+    clearInterval(syncTimer);
+    syncTimer = null;
+  }
+}
+
+function updateLyricsFromYouTube() {
+
+  if (
+    !ytPlayer ||
+    !lines.length
+  ) {
+    return;
+  }
+
+  let time = 0;
+
+  try {
+
+    if (
+      typeof ytPlayer.getCurrentTime !==
+      "function"
+    ) {
+      return;
+    }
+
+    time =
+      Number(
+        ytPlayer.getCurrentTime()
+      ) || 0;
+
+  } catch {
+    return;
+  }
+
+  let left = 0;
+  let right = lines.length - 1;
+  let active = -1;
+
+  // Binary search
+  while (left <= right) {
+
+    const middle =
+      (left + right) >> 1;
+
+    if (
+      lines[middle].time <= time
+    ) {
+      active = middle;
+      left = middle + 1;
+    } else {
+      right = middle - 1;
+    }
+  }
+
+  if (active >= 0) {
+    highlightLine(
+      active,
+      false
+    );
+  }
+}
+
+function highlightLine(
+  index,
+  scroll = true
+) {
+
+  document
+    .querySelectorAll(".line")
+    .forEach((element, i) => {
+
+      element.classList.toggle(
+        "current",
+        i === index
+      );
+    });
+
+  if (!scroll)
+    return;
+
+  const element =
+    document.querySelector(
+      '.line[data-i="' +
+      index +
+      '"]'
+    );
+
+  if (element) {
+
+    element.scrollIntoView({
+      behavior: "smooth",
+      block: "center"
+    });
+  }
+}
+
+function seekYouTubeTo(seconds) {
+
+  if (!ytPlayer)
+    return;
+
+  try {
+
+    ytPlayer.seekTo(
+      Math.max(
+        0,
+        Number(seconds) || 0
+      ),
+      true
+    );
+
+    if (
+      typeof ytPlayer.playVideo ===
+      "function"
+    ) {
+      ytPlayer.playVideo();
+    }
+
+    startSync();
+
+  } catch {}
+}
+
+// ================================
+// OPEN SONG
+// ================================
+
+async function openSong(index) {
+
+  const song =
+    results[index];
+
+  if (!song)
+    return;
+
+  current = song;
+
+  remember(song);
+
+  $("homePanels")
+    .style.display = "none";
+
+  $("results")
+    .style.display = "none";
+
+  $("view")
+    .style.display = "block";
+
+  $("art").src =
+    song.art || "";
+
+  $("title").textContent =
+    song.trackName;
+
+  $("artist").textContent =
+    song.artistName;
+
+  $("status").textContent =
+    "Loading lyrics…";
+
+  $("lyrics").innerHTML =
+    '<div class="empty">Loading lyrics…</div>';
+
+  mode =
+    $("mode").value =
+      "original";
+
+  lyricsData = null;
+  lines = [];
+
+  stopSync();
+
+  // Stop old preview
+  if (previewAudio) {
+    try {
+      previewAudio.pause();
+    } catch {}
+  }
+
+  // Load YouTube
+  loadYouTube(song);
+
+  // Load lyrics
+  try {
+
+    const url =
+      WORKER +
+      "/api/lyrics?" +
+      new URLSearchParams({
+        track: song.trackName,
+        artist: song.artistName,
+        album: song.albumName || "",
+        duration:
+          song.duration
+            ? String(
+                Math.round(
+                  song.duration
+                )
+              )
+            : ""
+      });
+
+    const data =
+      await api(url);
+
+    if (
+      data &&
+      data.found
+    ) {
+      lyricsData = data;
+
+      $("status").textContent =
+        data.syncedLyrics
+          ? "Synced lyrics loaded"
+          : "Lyrics loaded";
+
+      renderLyrics();
+
+    } else {
+
+      $("status").textContent =
+        "Lyrics not found";
+
+      $("lyrics").innerHTML =
+        '<div class="empty">Lyrics not found for this version.</div>';
+    }
+
+  } catch (error) {
+
+    console.error(
+      "Lyrics error:",
+      error
+    );
+
+    $("status").textContent =
+      "Lyrics unavailable";
+
+    $("lyrics").innerHTML =
+      '<div class="empty">Could not load lyrics.</div>';
+  }
+
+  renderHome();
+}
+
+// ================================
+// PREVIEW AUDIO
+// ================================
+
+function playPreview() {
+
+  if (!current)
+    return;
+
+  if (!current.previewUrl) {
+
+    $("status").textContent =
+      "Preview unavailable";
+
+    return;
+  }
+
+  if (previewAudio) {
+    try {
+      previewAudio.pause();
+    } catch {}
+  }
+
+  previewAudio =
+    new Audio(
+      current.previewUrl
+    );
+
+  previewAudio.preload =
+    "metadata";
+
+  previewAudio.play()
+    .then(() => {
+
+      $("audioBar")
+        .style.display =
+        "flex";
+
+      $("aicon").src =
+        current.art || "";
+
+      $("aname").textContent =
+        current.trackName;
+
+      $("aartist").textContent =
+        current.artistName;
+
+      $("audio").src =
+        current.previewUrl;
+
+    })
+    .catch(() => {
+
+      $("status").textContent =
+        "Preview could not play";
+    });
+}
+
+// ================================
+// NAVIGATION
+// ================================
+
+function showHome() {
+
+  stopSync();
+
+  $("view")
+    .style.display = "none";
+
+  $("results")
+    .style.display = "none";
+
+  $("homePanels")
+    .style.display = "grid";
+
+  renderHome();
+}
+
+function showResults() {
+
+  stopSync();
+
+  $("view")
+    .style.display = "none";
+
+  $("homePanels")
+    .style.display = "none";
+
+  $("results")
+    .style.display = "block";
+
+  renderResults();
+}
+
+// ================================
+// EVENTS
+// ================================
+
+$("go").onclick =
+  async function() {
+
+    const query =
+      $("q").value.trim();
+
+    if (!query)
+      return;
+
+    $("go").textContent =
+      "SEARCHING…";
+
+    try {
+
+      results =
+        await searchSongs(
+          query
+        );
+
+      renderResults();
+
+    } catch (error) {
+
+      console.error(
+        "Search error:",
+        error
+      );
+
+      $("homePanels")
+        .style.display = "none";
+
+      $("results")
+        .style.display = "block";
+
+      $("list").innerHTML =
+        '<div class="empty">Search failed. Please try again.</div>';
+
+    } finally {
+
+      $("go").textContent =
+        "SEARCH ✦";
+    }
+  };
+
+$("q").addEventListener(
+  "keydown",
+  event => {
+
+    if (event.key === "Enter") {
+      $("go").click();
+    }
+  }
+);
+
+$("back").onclick =
+  showResults;
+
+$("homeBtn").onclick =
+  showHome;
+
+$("trendBtn").onclick =
+  function() {
+
+    showHome();
+
+    document
+      .querySelector(".section.full")
+      ?.scrollIntoView({
+        behavior: "smooth"
+      });
+  };
+
+$("libBtn").onclick =
+  function() {
+
+    showHome();
+
+    document
+      .querySelectorAll(
+        ".section"
+      )[1]
+      ?.scrollIntoView({
+        behavior: "smooth"
+      });
+  };
+
+$("histBtn").onclick =
+  function() {
+
+    showHome();
+
+    document
+      .querySelectorAll(
+        ".section"
+      )[2]
+      ?.scrollIntoView({
+        behavior: "smooth"
+      });
+  };
+
+$("mode").onchange =
+  function(event) {
+
+    mode =
+      event.target.value;
+
+    renderLyrics();
+  };
+
+$("sync").onclick =
+  function() {
+
+    updateLyricsFromYouTube();
+
+    startSync();
+  };
+
+$("play").onclick =
+  playPreview;
+
+$("save").onclick =
+  function() {
+
+    if (!current)
+      return;
+
+    saveSong(current);
+
+    $("save").textContent =
+      "✓ Saved";
+  };
+
+$("closeaudio").onclick =
+  function() {
+
+    if (previewAudio) {
+      try {
+        previewAudio.pause();
+      } catch {}
+    }
+
+    $("audioBar")
+      .style.display =
+      "none";
+  };
+
+$("signin").onclick =
+  function() {
+
+    $("modal")
+      .style.display =
+      "grid";
+  };
+
+$("close").onclick =
+  function() {
+
+    $("modal")
+      .style.display =
+      "none";
+  };
+
+$("google").onclick =
+  function() {
+
+    alert(
+      "Google OAuth needs a Client ID and redirect configuration first."
+    );
+  };
+
+// ================================
+// INIT
+// ================================
+
+renderHome();
+loadTrending();
 </script>
 </body>
 </html>
