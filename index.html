@@ -113,12 +113,54 @@ function render(){
  document.querySelectorAll(".item").forEach(b=>b.onclick=()=>openSong(+b.dataset.i));
 }
 
-function parseLrc(t){
- return String(t||"").split(/\r?\n/).flatMap(line=>{
-  const ms=[...line.matchAll(/\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/g)];
-  const text=line.replace(/\[\d+:\d{2}(?:[.:]\d{1,3})?\]/g,"").trim();
-  return ms.map(m=>({time:Number(m[1])*60+Number(m[2])+(m[3]?Number("0."+m[3]):0),text}));
- }).filter(x=>x.text).sort((a,b)=>a.time-b.time);
+function parseLrc(text){
+  const output=[];
+
+  String(text||"").split(/\r?\n/).forEach(line=>{
+    const matches=[
+      ...line.matchAll(
+        /\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/g
+      )
+    ];
+
+    const lyricText=
+      line
+        .replace(
+          /\[(\d+):(\d{2})(?:[.:](\d{1,3}))?\]/g,
+          ""
+        )
+        .trim();
+
+    if(!lyricText) return;
+
+    for(const m of matches){
+
+      let fraction=0;
+
+      if(m[3]){
+        if(m[3].length===1){
+          fraction=Number(m[3])/10;
+        }else if(m[3].length===2){
+          fraction=Number(m[3])/100;
+        }else{
+          fraction=Number(m[3])/1000;
+        }
+      }
+
+      output.push({
+        time:
+          Number(m[1])*60+
+          Number(m[2])+
+          fraction,
+
+        text:lyricText
+      });
+    }
+  });
+
+  return output
+    .filter(x=>Number.isFinite(x.time)&&x.text)
+    .sort((a,b)=>a.time-b.time);
 }
 
 function clean(t){
@@ -139,7 +181,7 @@ function renderLyrics(){
   $("lyrics").innerHTML='<div class="plain">'+esc(out).replace(/\n/g,"<br>")+"</div>";return;
  }
  if(synced.trim()){
-  lines=parseLrc(synced);
+  lines=parseLrc(synced); activeLyricIndex=-1;
   if(!lines.length){$("lyrics").innerHTML='<div class="empty">Lyrics found, but timestamps are unavailable.</div>';return}
   $("lyrics").innerHTML=lines.map((l,i)=>`<button class="line" data-i="${i}">${esc(l.text)}</button>`).join("");
   document.querySelectorAll(".line").forEach(b=>b.onclick=()=>seekYouTubeTo(lines[+b.dataset.i]?.time||0));
@@ -149,35 +191,96 @@ function renderLyrics(){
  }
 }
 
+let activeLyricIndex=-1;
+
 function highlight(i,scroll=false){
- document.querySelectorAll(".line").forEach((e,n)=>e.classList.toggle("current",n===i));
- if(scroll){
-  const e=document.querySelector(`.line[data-i="${i}"]`);
-  if(e)e.scrollIntoView({behavior:"smooth",block:"center"});
- }
+  if(i<0 || i>=lines.length) return;
+
+  if(activeLyricIndex===i) return;
+  activeLyricIndex=i;
+
+  document.querySelectorAll(".line").forEach((e,n)=>{
+    e.classList.toggle("current",n===i);
+  });
+
+  if(scroll){
+    const e=document.querySelector(`.line[data-i="${i}"]`);
+    if(e){
+      e.scrollIntoView({
+        behavior:"smooth",
+        block:"center"
+      });
+    }
+  }
 }
 
 function startSync(){
- stopSync();if(!lines.length)return;
- updateLyricsFromYouTube();timer=setInterval(updateLyricsFromYouTube,100);
+  stopSync();
+
+  if(!lines.length || !ytPlayer) return;
+
+  updateLyricsFromYouTube();
+
+  // 50ms gives smooth highlighting without hammering the YouTube API.
+  timer=setInterval(updateLyricsFromYouTube,50);
 }
-function stopSync(){if(timer){clearInterval(timer);timer=null}}
+
+function stopSync(){
+  if(timer){
+    clearInterval(timer);
+    timer=null;
+  }
+}
+
+function getYouTubeTime(){
+  if(!ytPlayer) return null;
+
+  try{
+    if(typeof ytPlayer.getCurrentTime!=="function"){
+      return null;
+    }
+
+    const t=Number(ytPlayer.getCurrentTime());
+
+    if(!Number.isFinite(t)) return null;
+
+    return Math.max(0,t);
+  }catch{
+    return null;
+  }
+}
+
+function findLyricIndex(time){
+  if(!lines.length) return -1;
+
+  let lo=0;
+  let hi=lines.length-1;
+  let answer=-1;
+
+  while(lo<=hi){
+    const mid=(lo+hi)>>1;
+
+    if(lines[mid].time<=time){
+      answer=mid;
+      lo=mid+1;
+    }else{
+      hi=mid-1;
+    }
+  }
+
+  return answer;
+}
 
 function updateLyricsFromYouTube(){
- if(!ytPlayer||!lines.length)return;
- let time=0,state=-1;
- try{
-  state=ytPlayer.getPlayerState?.()??-1;
-  time=Number(ytPlayer.getCurrentTime?.()||0);
- }catch{return}
- if(state!==1&&state!==2&&state!==0)return;
+  const time=getYouTubeTime();
 
- let lo=0,hi=lines.length-1,active=-1;
- while(lo<=hi){
-  const mid=(lo+hi)>>1;
-  if(lines[mid].time<=time){active=mid;lo=mid+1}else hi=mid-1;
- }
- if(active>=0)highlight(active,false);
+  if(time===null || !lines.length) return;
+
+  const index=findLyricIndex(time);
+
+  if(index>=0){
+    highlight(index,false);
+  }
 }
 
 function seekYouTubeTo(seconds){
@@ -378,7 +481,7 @@ async function openSong(index){
  $("artist").textContent=song.artistName;
  $("status").textContent="Loading lyrics…";
  $("lyrics").innerHTML='<div class="empty">Loading lyrics…</div>';
- $("mode").value="original";mode="original";lyricsData=null;lines=[];stopSync();
+ $("mode").value="original";mode="original";lyricsData=null;lines=[];activeLyricIndex=-1;stopSync();
 
  await Promise.allSettled([loadYouTube(song),loadLyrics(song)]);
  renderHome();
