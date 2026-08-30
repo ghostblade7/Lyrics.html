@@ -417,7 +417,22 @@ $("histBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[2]?.s
 $("mode").onchange=e=>{mode=e.target.value;renderLyrics()};
 $("sync").onclick=()=>{updateLyricsFromYouTube();startSync()};
 $("play").onclick=playPreview;
-$("save").onclick=()=>{if(current){saveSong(current);$("save").textContent="✓ Saved"}};
+$("save").onclick=()=>{
+  if(!current)return;
+
+  const lib=store(KEYS.lib);
+  const exists=lib.some(x=>x.id===current.id);
+
+  if(exists){
+    $("save").textContent="✓ Saved";
+    return;
+  }
+
+  lib.unshift(current);
+  put(KEYS.lib,lib);
+  $("save").textContent="✓ Saved";
+  renderHome();
+};
 $("closeaudio").onclick=()=>{if(previewAudio)try{previewAudio.pause()}catch{}$("audioBar").style.display="none"};
 $("signin").onclick=()=>{$("modal").style.display="grid"};
 $("close").onclick=()=>{$("modal").style.display="none"};
