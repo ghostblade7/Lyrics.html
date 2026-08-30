@@ -10,31 +10,17 @@
 </style>
 
 <style id="youtube-player-fix">
-.videobody{position:relative;overflow:hidden;min-height:320px}
-.videobody iframe{
-  display:block !important;
-  width:100% !important;
-  height:100% !important;
-  min-height:320px !important;
-  border:0 !important;
-  position:relative !important;
-  z-index:2 !important;
-  background:#000 !important;
-}
-.videoprompt{display:none !important}
-</style>
-
-<style id="yt-final-fix">
 .videobody{position:relative;overflow:hidden;aspect-ratio:16/9;min-height:0;background:#000}
-.videobody iframe#ytFrame{display:block!important;position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;border:0!important;z-index:5!important;background:#000!important}
-.videoprompt{display:none!important}
+#ytFrame{position:absolute;inset:0;width:100%;height:100%;z-index:5;background:#000}
+#ytFrame iframe,.videobody iframe{display:block!important;width:100%!important;height:100%!important;border:0!important}
+.videoprompt{z-index:10}
 </style>
 </head>
 <body>
 <div class="grain"></div>
 <nav><div class="brand">Songs <b>World</b> ✦</div><div class="navlinks"><button id="homeBtn">Home</button><button id="trendBtn">🔥 Trending</button><button id="libBtn">♡ Library</button><button id="histBtn">◷ History</button><button class="signin" id="signin">Sign in</button></div></nav>
 <section class="hero"><div class="eyebrow">Music • Lyrics • Discover</div><h1>Find your<br>next obsession.</h1><p>Search songs, artists or movies. Discover what's trending, save favourites and play lyrics with a responsive YouTube player.</p><div class="search"><input id="q" autocomplete="off" placeholder="Search a song, artist or movie…"><button id="go">SEARCH ✦</button></div><div class="suggestions" id="suggestions"></div></section>
-<main class="content"><div id="homePanels" class="homegrid"><section class="section full"><div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending now</h2></div><span class="muted" id="trendStatus">Loading…</span></div><div class="cards" id="trending"></div></section><section class="section"><div class="sectionhead"><h2>♡ My Library</h2></div><div class="cards" id="library"></div></section><section class="section"><div class="sectionhead"><h2>◷ Recent</h2></div><div class="cards" id="history"></div></section></div><section class="results" id="results"><div class="head"><div><div class="eyebrow">Search results</div><h2>Pick your track</h2></div><span class="muted" id="count"></span></div><div class="list" id="list"></div></section><section class="view" id="view"><button class="back" id="back">← Back</button><div class="grid"><aside class="card song"><div class="cover"><img id="art" alt="Album art"><div class="disc" id="disc"></div></div><h3 id="title">Song</h3><div class="artist" id="artist">Artist</div><div class="status" id="status">Ready</div><div class="actions"><button class="primary" id="play">▶ Play preview</button><button id="save">♡ Save</button></div></aside><article class="card lyrics"><div class="lyricshead"><div><div class="eyebrow">The words</div><h2>Lyrics</h2></div><div class="options"><span>SHOW AS</span><select id="mode"><option value="original">Original</option><option value="roman">English letters</option></select></div></div><div class="tools"><button class="sync" id="sync">SYNC ↺</button></div><div class="lyricsbox" id="lyrics"><div class="empty">Select a song.</div></div><div class="video"><div class="videohead"><span>▶ YOUTUBE</span><span id="ytname">SEARCHING…</span></div><div class="videobody"><iframe id="ytFrame" title="YouTube player" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe><div class="videoprompt" id="videoprompt"><div><div class="vicon">▶</div><b id="ytTitle">Finding a playable video…</b><small id="ytArtist">Please wait</small><a class="watch" id="ytLink" target="_blank" rel="noopener">OPEN YOUTUBE ↗</a></div></div></div></div></article></div></section></main>
+<main class="content"><div id="homePanels" class="homegrid"><section class="section full"><div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending now</h2></div><span class="muted" id="trendStatus">Loading…</span></div><div class="cards" id="trending"></div></section><section class="section"><div class="sectionhead"><h2>♡ My Library</h2></div><div class="cards" id="library"></div></section><section class="section"><div class="sectionhead"><h2>◷ Recent</h2></div><div class="cards" id="history"></div></section></div><section class="results" id="results"><div class="head"><div><div class="eyebrow">Search results</div><h2>Pick your track</h2></div><span class="muted" id="count"></span></div><div class="list" id="list"></div></section><section class="view" id="view"><button class="back" id="back">← Back</button><div class="grid"><aside class="card song"><div class="cover"><img id="art" alt="Album art"><div class="disc" id="disc"></div></div><h3 id="title">Song</h3><div class="artist" id="artist">Artist</div><div class="status" id="status">Ready</div><div class="actions"><button class="primary" id="play">▶ Play preview</button><button id="save">♡ Save</button></div></aside><article class="card lyrics"><div class="lyricshead"><div><div class="eyebrow">The words</div><h2>Lyrics</h2></div><div class="options"><span>SHOW AS</span><select id="mode"><option value="original">Original</option><option value="roman">English letters</option></select></div></div><div class="tools"><button class="sync" id="sync">SYNC ↺</button></div><div class="lyricsbox" id="lyrics"><div class="empty">Select a song.</div></div><div class="video"><div class="videohead"><span>▶ YOUTUBE</span><span id="ytname">SEARCHING…</span></div><div class="videobody"><div id="ytFrame" aria-label="YouTube player"></div><div class="videoprompt" id="videoprompt"><div><div class="vicon">▶</div><b id="ytTitle">Finding a playable video…</b><small id="ytArtist">Please wait</small><a class="watch" id="ytLink" target="_blank" rel="noopener">OPEN YOUTUBE ↗</a></div></div></div></div></article></div></section></main>
 <div class="audio" id="audioBar"><img id="aicon"><div class="audioinfo"><b id="aname">Song</b><small id="aartist">Artist</small></div><audio id="audio" controls preload="metadata"></audio><button class="closeaudio" id="closeaudio">×</button></div><div class="modal" id="modal"><div class="modalbox"><div class="eyebrow">Welcome to Songs World</div><h2>Sign in</h2><p class="muted">Google sign-in needs your OAuth Client ID. Your Library and History already work on this device without an account.</p><button class="google" id="google">Continue with Google</button><button class="close" id="close">Close</button></div></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -203,106 +189,99 @@ function seekYouTubeTo(seconds){
 }
 
 function loadYouTubeAPI(){
- if(window.YT?.Player){createYouTubePlayer();return}
- if(document.getElementById("youtube-iframe-api"))return;
- const s=document.createElement("script");
- s.id="youtube-iframe-api";s.src="https://www.youtube.com/iframe_api";s.async=true;
- document.head.appendChild(s);
+  if(window.YT && window.YT.Player){
+    createYouTubePlayer();
+    return;
+  }
+
+  if(document.getElementById("youtube-iframe-api")) return;
+
+  const script=document.createElement("script");
+  script.id="youtube-iframe-api";
+  script.src="https://www.youtube.com/iframe_api";
+  script.async=true;
+  document.head.appendChild(script);
 }
-window.onYouTubeIframeAPIReady=()=>createYouTubePlayer();
+
+window.onYouTubeIframeAPIReady=function(){
+  createYouTubePlayer();
+};
 
 function createYouTubePlayer(){
-  const frame=$("ytFrame");
-  if(!frame||!window.YT?.Player||!ytVideoId)return;
+  const container=$("ytFrame");
+  if(!container || !ytVideoId || !window.YT || !window.YT.Player) return;
 
-  try{ytPlayer?.destroy?.()}catch{}
+  try{ ytPlayer?.destroy?.(); }catch{}
   ytPlayer=null;
+  container.innerHTML="";
 
-  try{
-    ytPlayer=new YT.Player(frame,{
-      events:{
-        onReady:()=>{
+  ytPlayer=new YT.Player("ytFrame",{
+    videoId:ytVideoId,
+    host:"https://www.youtube.com",
+    playerVars:{
+      autoplay:0,
+      controls:1,
+      rel:0,
+      playsinline:1,
+      enablejsapi:1,
+      origin:window.location.origin
+    },
+    events:{
+      onReady:function(){
+        console.log("YouTube player ready",ytVideoId);
+        $("videoprompt").style.display="none";
+        if(lines.length) startSync();
+      },
+      onStateChange:function(e){
+        if(e.data===1){
+          startSync();
+        }else if(e.data===2 || e.data===0){
           updateLyricsFromYouTube();
-          if(lines.length)startSync();
-        },
-        onStateChange:e=>{
-          if(e.data===1)startSync();
-          else if(e.data===2||e.data===0){
-            updateLyricsFromYouTube();
-            stopSync();
-          }
-        },
-        onError:e=>{
-          console.warn("YouTube embed error:",e.data);
-          // 2 = invalid ID, 5 = HTML5 player error,
-          // 100 = removed/private, 101/150 = embedding disabled,
-          // 153 = missing/invalid client identity/referrer.
-          if([2,5,100,101,150,153].includes(e.data)){
-            setTimeout(tryNextYouTubeVideo,150);
-          }
+          stopSync();
         }
       },
-      playerVars:{
-        playsinline:1,
-        controls:1,
-        rel:0,
-        modestbranding:1,
-        enablejsapi:1
+      onError:function(e){
+        console.warn("YouTube embed error",e.data,ytVideoId);
+        if([2,5,100,101,150,153].includes(e.data)){
+          setTimeout(tryNextYouTubeVideo,300);
+        }
       }
-    });
-  }catch(e){
-    console.error("YouTube API connection error:",e);
-    ytPlayer=null;
-    setTimeout(tryNextYouTubeVideo,150);
-  }
+    }
+  });
 }
 
 function setYouTubeCandidate(video){
-  const frame=$("ytFrame");
-  if(!frame||!video?.videoId)return;
+  if(!video?.videoId) return;
 
   ytVideoId=video.videoId;
-
   $("ytname").textContent=video.channel||"YouTube";
   $("ytTitle").textContent=video.title||"YouTube video";
   $("ytArtist").textContent=video.channel||"";
   $("ytLink").href=video.watchUrl||("https://www.youtube.com/watch?v="+video.videoId);
 
-  const src=
-    "https://www.youtube.com/embed/"+encodeURIComponent(video.videoId)+
-    "?playsinline=1"+
-    "&controls=1"+
-    "&rel=0"+
-    "&modestbranding=1"+
-    "&enablejsapi=1";
-
-  // Native iframe first. The API is attached only after it has loaded.
-  frame.onload=()=>{
-    setTimeout(()=>{
-      loadYouTubeAPI();
-      if(window.YT?.Player) createYouTubePlayer();
-    },400);
-  };
-  frame.src=src;
-  frame.style.display="block";
+  // The IFrame API creates the iframe. Do not manually set iframe.src.
+  $("videoprompt").style.display="none";
+  loadYouTubeAPI();
 }
 
 async function loadYouTube(song){
   stopSync();
-  try{ytPlayer?.destroy?.()}catch{}
+
+  try{ ytPlayer?.destroy?.(); }catch{}
   ytPlayer=null;
   ytVideoId=null;
   ytCandidates=[];
   ytIndex=0;
 
-  const frame=$("ytFrame");
+  const container=$("ytFrame");
+  if(container) container.innerHTML="";
+
   $("ytname").textContent="SEARCHING…";
   $("ytTitle").textContent="Finding a playable video…";
   $("ytArtist").textContent="Please wait";
+  $("videoprompt").style.display="none";
   $("ytLink").href="https://www.youtube.com/results?search_query="+
     encodeURIComponent(song.trackName+" "+song.artistName);
-
-  frame.src="about:blank";
 
   try{
     const d=await api(WORKER+"/api/youtube?"+new URLSearchParams({
@@ -310,50 +289,59 @@ async function loadYouTube(song){
     }));
 
     const videos=(d.videos||[]).filter(v=>v?.videoId);
-    if(!videos.length)throw Error("No YouTube result");
+    if(!videos.length) throw Error("No YouTube result");
 
-    // Try API-confirmed embeddable videos first, then the remaining results.
     ytCandidates=[
       ...videos.filter(v=>v.embeddable===true),
       ...videos.filter(v=>v.embeddable!==true)
     ];
 
-    // Remove duplicate IDs.
     const seen=new Set();
     ytCandidates=ytCandidates.filter(v=>{
-      if(seen.has(v.videoId))return false;
+      if(seen.has(v.videoId)) return false;
       seen.add(v.videoId);
       return true;
     });
 
     ytIndex=0;
     setYouTubeCandidate(ytCandidates[ytIndex]);
-
   }catch(e){
-    console.error("YouTube:",e);
+    console.error("YouTube search error:",e);
     $("ytname").textContent="UNAVAILABLE";
     $("ytTitle").textContent="YouTube video could not be loaded";
     $("ytArtist").textContent="Try Open YouTube";
+    $("videoprompt").style.display="flex";
     $("ytLink").href="https://www.youtube.com/results?search_query="+
       encodeURIComponent(song.trackName+" "+song.artistName);
   }
 }
 
 function tryNextYouTubeVideo(){
-  if(ytIndex+1>=ytCandidates.length){
+  if(ytIndex+1 >= ytCandidates.length){
     stopSync();
-    $("ytname").textContent="NOT EMBEDDABLE";
-    $("ytTitle").textContent="YouTube blocked embedded playback";
-    $("ytArtist").textContent="Try another result on YouTube";
-    $("ytLink").href="https://www.youtube.com/results?search_query="+
+    $("ytname").textContent="OPEN YOUTUBE";
+    $("ytTitle").textContent="No playable embedded result";
+    $("ytArtist").textContent="YouTube has restricted these videos";
+    $("ytLink").href=
+      "https://www.youtube.com/results?search_query="+
       encodeURIComponent((current?.trackName||"")+" "+(current?.artistName||""));
     return;
   }
 
   ytIndex++;
-  try{ytPlayer?.destroy?.()}catch{}
+
+  try{
+    if(ytPlayer) ytPlayer.destroy();
+  }catch{}
+
   ytPlayer=null;
-  setYouTubeCandidate(ytCandidates[ytIndex]);
+
+  const container=$("ytFrame");
+  if(container) container.innerHTML="";
+
+  setTimeout(()=>{
+    setYouTubeCandidate(ytCandidates[ytIndex]);
+  },250);
 }
 
 async function loadLyrics(song){
