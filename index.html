@@ -7,7 +7,34 @@
 <title>Songs World — Music & Lyrics</title>
 <style>
 :root{--bg:#061018;--panel:#0d1c26e8;--panel2:#102530e8;--text:#f5fbff;--muted:#91a7b3;--cyan:#55f2dc;--blue:#56a9ff;--violet:#a982ff;--pink:#ff76c8;--line:#ffffff18;--shadow:0 25px 80px #0009}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh;overflow-x:hidden}body:before,body:after{content:"";position:fixed;width:55vw;height:55vw;border-radius:50%;filter:blur(70px);opacity:.28;pointer-events:none;z-index:-2;animation:float 13s ease-in-out infinite alternate}body:before{background:#16e6c0;left:-22vw;top:-18vw}body:after{background:#875cff;right:-25vw;bottom:-18vw;animation-delay:-5s}@keyframes float{to{transform:translate(14vw,10vh) scale(1.2)}}.grain{position:fixed;inset:0;pointer-events:none;opacity:.05;z-index:-1;background-image:radial-gradient(#fff 1px,transparent 1px);background-size:5px 5px}button,input,select{font:inherit}button{cursor:pointer}nav{height:72px;position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(16px,5vw,70px);background:#061018cc;border-bottom:1px solid var(--line);backdrop-filter:blur(22px)}.brand{font-size:23px;font-weight:950;letter-spacing:-1px}.brand b{color:var(--cyan)}.navlinks{display:flex;gap:7px}.navlinks button,.signin{border:1px solid var(--line);background:#ffffff08;color:var(--text);border-radius:999px;padding:9px 14px;font-size:12px;font-weight:800}.navlinks button:hover,.signin:hover{background:#ffffff15}.signin{border-color:#55f2dc55;color:var(--cyan)}.hero{max-width:1100px;margin:auto;text-align:center;padding:clamp(60px,10vw,115px) 20px 60px}.eyebrow{color:var(--cyan);font-size:10px;font-weight:900;letter-spacing:3px;text-transform:uppercase}.hero h1{font-size:clamp(54px,9vw,112px);line-height:.86;letter-spacing:-7px;margin:15px 0 24px;background:linear-gradient(105deg,#fff 15%,#a7fff2 45%,#9c7dff 75%,#ff8ed0);-webkit-background-clip:text;background-clip:text;color:transparent}.hero p{max-width:650px;margin:0 auto 30px;color:var(--muted);line-height:1.7}.search{max-width:800px;margin:auto;display:flex;gap:8px;padding:8px;border:1px solid #ffffff25;background:#ffffff0b;border-radius:22px;box-shadow:var(--shadow)}.search input{flex:1;min-width:0;background:transparent;border:0;outline:0;color:#fff;padding:14px 15px}.search button{border:0;border-radius:15px;padding:13px 22px;color:#061018;background:var(--cyan);font-weight:950}.search button:hover{transform:translateY(-1px);box-shadow:0 8px 30px #55f2dc44}.suggestions{max-width:800px;margin:8px auto 0;text-align:left;background:#0c1b24f5;border:1px solid var(--line);border-radius:16px;overflow:hidden;display:none}.suggestions button{display:block;width:100%;padding:12px 15px;background:none;border:0;border-bottom:1px solid var(--line);color:#fff;text-align:left}.suggestions small{color:var(--muted)}.content{max-width:1200px;margin:auto;padding:0 20px 120px}.homegrid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.section{padding:20px;border:1px solid var(--line);background:linear-gradient(145deg,#10202ae8,#09151de8);border-radius:24px;box-shadow:var(--shadow)}.section.full{grid-column:1/-1}.sectionhead{display:flex;justify-content:space-between;align-items:end;margin-bottom:14px}.section h2{margin:3px 0 0;font-size:27px}.muted{color:var(--muted)}.cards{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.mini{border:1px solid var(--line);background:#ffffff08;color:#fff;border-radius:16px;padding:9px;text-align:left;min-width:0;transition:.2s}.mini:hover{transform:translateY(-3px);background:#ffffff12}.mini img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:11px;background:linear-gradient(135deg,#123,#55f2dc,#9c7dff)}.mini b,.mini small{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.mini b{margin-top:7px}.mini small{color:var(--muted);font-size:11px;margin-top:3px}.results{display:none}.head{display:flex;justify-content:space-between;align-items:end;margin:10px 0 16px}.head h2{margin:4px 0;font-size:34px}.list{display:grid;gap:10px}.item{display:grid;grid-template-columns:68px 1fr auto;gap:14px;align-items:center;width:100%;padding:10px;border:1px solid var(--line);border-radius:18px;background:#ffffff08;color:#fff;text-align:left;animation:rise .3s both}.item:hover{background:#ffffff12;transform:translateY(-2px)}.thumb{width:68px;height:68px;object-fit:cover;border-radius:13px;background:linear-gradient(135deg,#102,#55f2dc,#a982ff)}.songname{font-weight:900}.meta{display:block;color:var(--muted);font-size:12px;margin-top:4px}.arrow{font-size:25px;color:var(--cyan)}@keyframes rise{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:none}}.view{display:none}.back{border:0;background:none;color:var(--cyan);font-weight:900;margin:0 0 15px;padding:0}.grid{display:grid;grid-template-columns:320px minmax(0,1fr);gap:18px}.card{border:1px solid var(--line);border-radius:25px;background:linear-gradient(145deg,#10202af0,#09151df0);box-shadow:var(--shadow);overflow:hidden}.song{padding:20px;height:max-content}.cover{aspect-ratio:1;border-radius:18px;overflow:hidden;display:grid;place-items:center;background:radial-gradient(circle,#55f2dc,#193e47 35%,#071018)}.cover img{width:100%;height:100%;object-fit:cover}.disc{width:110px;height:110px;border-radius:50%;background:repeating-radial-gradient(circle,#071018 0 8px,#26353b 9px 11px);animation:spin 4s linear infinite}@keyframes spin{to{transform:rotate(360deg)}}.song h3{font-size:29px;line-height:1.05;margin:18px 0 6px}.artist{color:var(--pink);font-weight:900}.status{margin-top:13px;padding:11px;border-radius:12px;background:#ffffff08;color:var(--muted);font-size:12px}.actions{display:flex;gap:8px;margin-top:12px}.actions button{flex:1;padding:11px;border-radius:12px;border:1px solid var(--line);background:#ffffff08;color:#fff;font-weight:900}.actions .primary{border:0;background:var(--cyan);color:#061018}.lyrics{padding:25px}.lyricshead{display:flex;justify-content:space-between;gap:12px;align-items:start;border-bottom:1px solid var(--line);padding-bottom:15px}.lyricshead h2{font-size:39px;margin:4px 0}.options{display:flex;align-items:center;gap:7px}.options span{font-size:8px;letter-spacing:1.5px;color:var(--muted)}select{background:#0d1c26;color:#fff;border:1px solid var(--line);border-radius:999px;padding:7px}.tools{text-align:right;margin:10px 0}.sync{border:1px solid #55f2dc55;background:#55f2dc0c;color:var(--cyan);border-radius:999px;padding:7px 12px;font-size:10px;font-weight:900}.lyricsbox{height:52vh;min-height:350px;overflow:auto;padding:4px}.line{display:block;width:100%;border:0;background:none;color:#718691;text-align:left;font:20px/1.55 Georgia,serif;padding:8px 3px}.line.current{color:#fff;font-size:24px;font-weight:800;transform:translateX(4px)}.plain{font:20px/1.8 Georgia,serif;color:#e1edf1}.video{margin-top:20px;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#02070a}.videohead{padding:11px 13px;display:flex;justify-content:space-between;font-size:10px;font-weight:900;letter-spacing:1.5px}.videobody{position:relative;aspect-ratio:16/9}.videobody iframe{position:absolute;inset:0;width:100%;height:100%;border:0}.videoprompt{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;padding:20px;background:radial-gradient(circle at 50% 25%,#164c55,#071018 68%)}.vicon{font-size:45px;color:var(--cyan)}.videoprompt b,.videoprompt small{display:block}.videoprompt small{color:var(--muted);margin:6px 0 14px}.watch{display:inline-block;text-decoration:none;color:#061018;background:var(--cyan);padding:10px 15px;border-radius:999px;font-size:10px;font-weight:950}.audio{position:fixed;z-index:50;left:50%;bottom:14px;transform:translateX(-50%);width:min(720px,calc(100% - 24px));display:none;align-items:center;gap:10px;padding:9px 11px;background:#0b1821ee;border:1px solid #ffffff22;border-radius:18px;backdrop-filter:blur(20px);box-shadow:0 15px 50px #000b}.audio img{width:44px;height:44px;border-radius:10px;object-fit:cover}.audioinfo{flex:1;min-width:0}.audioinfo b,.audioinfo small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.audioinfo small{color:var(--muted)}.audio audio{width:230px}.closeaudio{border:0;background:none;color:var(--muted);font-size:20px}.modal{position:fixed;inset:0;z-index:100;display:none;place-items:center;background:#000b;backdrop-filter:blur(12px);padding:20px}.modalbox{width:min(430px,100%);padding:28px;border:1px solid var(--line);border-radius:25px;background:#0d1c26;box-shadow:var(--shadow);text-align:center}.google{width:100%;padding:13px;border-radius:13px;border:1px solid #ffffff25;background:#fff;color:#111;font-weight:900}.close{margin-top:12px;border:0;background:none;color:var(--muted)}@media(max-width:850px){.homegrid{grid-template-columns:1fr}.section.full{grid-column:auto}.cards{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:1fr}.song{display:grid;grid-template-columns:150px 1fr;gap:16px}.cover{grid-row:span 4}.song h3{margin:5px 0}.actions{grid-column:2}.lyrics{padding:20px}}@media(max-width:560px){nav{height:62px}.brand{font-size:19px}.navlinks button{padding:8px 10px}.navlinks button:nth-child(1){display:none}.hero h1{letter-spacing:-5px}.search{display:grid;border-radius:18px}.search button{width:100%}.cards{grid-template-columns:repeat(2,1fr)}.song{display:block}.cover{margin-bottom:15px}.actions{display:flex}.lyricshead{flex-direction:column}.options{align-self:flex-end}.item{grid-template-columns:55px 1fr auto}.thumb{width:55px;height:55px}.audio audio{width:120px}.audio img{width:38px;height:38px}}
+
+<style id="compact-youtube-style">
+.video{margin-top:16px}
+.videobody{aspect-ratio:16/8;max-height:250px}
+.related{margin-top:14px}
+.related h3{margin:0 0 10px;font-size:17px}
+.related-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}
+.related-card{border:1px solid var(--line);background:#ffffff08;color:#fff;border-radius:13px;padding:7px;text-align:left;min-width:0}
+.related-card:hover{background:#ffffff12;transform:translateY(-2px)}
+.related-card img{width:100%;aspect-ratio:16/9;object-fit:cover;border-radius:9px;background:#102}
+.related-card b{display:block;font-size:11px;margin-top:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.related-card small{display:block;color:var(--muted);font-size:9px;margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@media(max-width:700px){
+  .videobody{aspect-ratio:16/9;max-height:none}
+  .related-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
 </style>
+</style>
+<style id="collection-view-style">
+#collectionView{display:none}
+.collection-empty{
+  padding:60px 20px;text-align:center;
+  border:1px dashed var(--line);border-radius:22px;
+  color:var(--muted)
+}
+.collection-empty b{display:block;color:var(--text);font-size:20px;margin-bottom:6px}
+</style>
+
 
 <style id="youtube-player-fix">
 .videobody{position:relative;overflow:hidden;aspect-ratio:16/9;min-height:0;background:#000}
@@ -20,7 +47,24 @@
 <div class="grain"></div>
 <nav><div class="brand">Songs <b>World</b> ✦</div><div class="navlinks"><button id="homeBtn">Home</button><button id="trendBtn">🔥 Trending</button><button id="libBtn">♡ Library</button><button id="histBtn">◷ History</button><button class="signin" id="signin">Sign in</button></div></nav>
 <section class="hero"><div class="eyebrow">Music • Lyrics • Discover</div><h1>Find your<br>next obsession.</h1><p>Search songs, artists or movies. Discover what's trending, save favourites and play lyrics with a responsive YouTube player.</p><div class="search"><input id="q" autocomplete="off" placeholder="Search a song, artist or movie…"><button id="go">SEARCH ✦</button></div><div class="suggestions" id="suggestions"></div></section>
-<main class="content"><div id="homePanels" class="homegrid"><section class="section full"><div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending now</h2></div><span class="muted" id="trendStatus">Loading…</span></div><div class="cards" id="trending"></div></section><section class="section"><div class="sectionhead"><h2>♡ My Library</h2></div><div class="cards" id="library"></div></section><section class="section"><div class="sectionhead"><h2>◷ Recent</h2></div><div class="cards" id="history"></div></section></div><section class="results" id="results"><div class="head"><div><div class="eyebrow">Search results</div><h2>Pick your track</h2></div><span class="muted" id="count"></span></div><div class="list" id="list"></div></section><section class="view" id="view"><button class="back" id="back">← Back</button><div class="grid"><aside class="card song"><div class="cover"><img id="art" alt="Album art"><div class="disc" id="disc"></div></div><h3 id="title">Song</h3><div class="artist" id="artist">Artist</div><div class="status" id="status">Ready</div><div class="actions"><button class="primary" id="play">▶ Play preview</button><button id="save">♡ Save</button></div></aside><article class="card lyrics"><div class="lyricshead"><div><div class="eyebrow">The words</div><h2>Lyrics</h2></div><div class="options"><span>SHOW AS</span><select id="mode"><option value="original">Original</option><option value="roman">English letters</option></select></div></div><div class="tools"><button class="sync" id="sync">SYNC ↺</button></div><div class="lyricsbox" id="lyrics"><div class="empty">Select a song.</div></div><div class="video"><div class="videohead"><span>▶ YOUTUBE</span><span id="ytname">SEARCHING…</span></div><div class="videobody"><div id="ytFrame" aria-label="YouTube player"></div><div class="videoprompt" id="videoprompt"><div><div class="vicon">▶</div><b id="ytTitle">Finding a playable video…</b><small id="ytArtist">Please wait</small><a class="watch" id="ytLink" target="_blank" rel="noopener">OPEN YOUTUBE ↗</a></div></div></div></div></article></div></section></main>
+<main class="content"><div id="homePanels" class="homegrid"><section class="section full"><div class="sectionhead"><div><div class="eyebrow">What's moving</div><h2>Trending now</h2></div><span class="muted" id="trendStatus">Loading…</span></div><div class="cards" id="trending"></div></section><section class="section"><div class="sectionhead"><h2>♡ My Library</h2></div><div class="cards" id="library"></div></section><section class="section"><div class="sectionhead"><h2>◷ Recent</h2></div><div class="cards" id="history"></div></section></div>
+<section class="results" id="collectionView">
+  <div class="head">
+    <div>
+      <div class="eyebrow" id="collectionEyebrow">Your music</div>
+      <h2 id="collectionTitle">Library</h2>
+    </div>
+    <span class="muted" id="collectionCount"></span>
+  </div>
+  <div class="list" id="collectionList"></div>
+</section>
+
+<section class="results" id="results"><div class="head"><div><div class="eyebrow">Search results</div><h2>Pick your track</h2></div><span class="muted" id="count"></span></div><div class="list" id="list"></div></section><section class="view" id="view"><button class="back" id="back">← Back</button><div class="grid"><aside class="card song"><div class="cover"><img id="art" alt="Album art"><div class="disc" id="disc"></div></div><h3 id="title">Song</h3><div class="artist" id="artist">Artist</div><div class="status" id="status">Ready</div><div class="actions"><button class="primary" id="play">▶ Play preview</button><button id="save">♡ Save</button></div></aside><article class="card lyrics"><div class="lyricshead"><div><div class="eyebrow">The words</div><h2>Lyrics</h2></div><div class="options"><span>SHOW AS</span><select id="mode"><option value="original">Original</option><option value="roman">English letters</option></select></div></div><div class="tools"><button class="sync" id="sync">SYNC ↺</button></div><div class="lyricsbox" id="lyrics"><div class="empty">Select a song.</div></div><div class="video"><div class="videohead"><span>▶ YOUTUBE</span><span id="ytname">SEARCHING…</span></div><div class="videobody"><div id="ytFrame" aria-label="YouTube player"></div><div class="videoprompt" id="videoprompt"><div><div class="vicon">▶</div><b id="ytTitle">Finding a playable video…</b><small id="ytArtist">Please wait</small><a class="watch" id="ytLink" target="_blank" rel="noopener">OPEN YOUTUBE ↗</a></div></div></div>
+<div class="related">
+  <h3>More from YouTube</h3>
+  <div class="related-grid" id="relatedVideos"></div>
+</div>
+</article></div></section></main>
 <div class="audio" id="audioBar"><img id="aicon"><div class="audioinfo"><b id="aname">Song</b><small id="aartist">Artist</small></div><audio id="audio" controls preload="metadata"></audio><button class="closeaudio" id="closeaudio">×</button></div><div class="modal" id="modal"><div class="modalbox"><div class="eyebrow">Welcome to Songs World</div><h2>Sign in</h2><p class="muted">Google sign-in needs your OAuth Client ID. Your Library and History already work on this device without an account.</p><button class="google" id="google">Continue with Google</button><button class="close" id="close">Close</button></div></div>
 <script>
 const $=id=>document.getElementById(id);
@@ -250,10 +294,52 @@ function createYouTubePlayer(){
   });
 }
 
+
+function renderRelatedVideos(){
+  const box=$("relatedVideos");
+  if(!box)return;
+
+  const others=ytCandidates.filter(
+    (v,i)=>v?.videoId && i!==ytIndex
+  ).slice(0,4);
+
+  if(!others.length){
+    box.innerHTML='<span class="muted">No other playable suggestions.</span>';
+    return;
+  }
+
+  box.innerHTML=others.map(v=>`
+    <button class="related-card" data-video="${esc(v.videoId)}">
+      <img src="${esc(v.thumbnail||"")}" alt="">
+      <b>${esc(v.title||"YouTube video")}</b>
+      <small>${esc(v.channel||"YouTube")}</small>
+    </button>
+  `).join("");
+
+  box.querySelectorAll(".related-card").forEach(btn=>{
+    btn.onclick=()=>{
+      const id=btn.dataset.video;
+      const index=ytCandidates.findIndex(v=>v.videoId===id);
+      if(index<0)return;
+
+      ytIndex=index;
+
+      try{ytPlayer?.destroy?.()}catch{}
+      ytPlayer=null;
+
+      const container=$("ytFrame");
+      if(container)container.innerHTML="";
+
+      setYouTubeCandidate(ytCandidates[ytIndex]);
+    };
+  });
+}
+
 function setYouTubeCandidate(video){
   if(!video?.videoId) return;
 
   ytVideoId=video.videoId;
+  renderRelatedVideos();
   $("ytname").textContent=video.channel||"YouTube";
   $("ytTitle").textContent=video.title||"YouTube video";
   $("ytArtist").textContent=video.channel||"";
@@ -304,6 +390,7 @@ async function loadYouTube(song){
     });
 
     ytIndex=0;
+    renderRelatedVideos();
     setYouTubeCandidate(ytCandidates[ytIndex]);
   }catch(e){
     console.error("YouTube search error:",e);
@@ -365,7 +452,7 @@ async function loadLyrics(song){
  }
 }
 
-async function openSong(index){
+async function openSong(index,push=true){
  const song=results[index];if(!song)return;
  current=song;
   updateSaveButton();
@@ -405,16 +492,159 @@ function showHome(){
 $("go").onclick=async()=>{
  const q=$("q").value.trim();if(!q)return;
  $("go").textContent="SEARCHING…";
- try{results=await search(q);render()}
+ try{results=await search(q);showResults(true)}
  catch(e){console.error(e);$("homePanels").style.display="none";$("results").style.display="block";$("list").innerHTML='<div class="empty">Search failed. Please try again.</div>'}
  finally{$("go").textContent="SEARCH ✦"}
 };
 $("q").addEventListener("keydown",e=>{if(e.key==="Enter")$("go").click()});
-$("back").onclick=()=>{stopSync();$("view").style.display="none";$("results").style.display="block";render()};
-$("homeBtn").onclick=showHome;
-$("trendBtn").onclick=()=>{showHome();document.querySelector(".section.full")?.scrollIntoView({behavior:"smooth"})};
-$("libBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[1]?.scrollIntoView({behavior:"smooth"})};
-$("histBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[2]?.scrollIntoView({behavior:"smooth"})};
+function showHome(){
+  stopSync();
+  $("view").style.display="none";
+  $("results").style.display="none";
+  $("collectionView").style.display="none";
+  $("homePanels").style.display="grid";
+  renderHome();
+
+  history.pushState(
+    {songsWorld:true,page:"home"},
+    "",
+    "#home"
+  );
+}
+
+function showCollection(type, push=true){
+  stopSync();
+
+  $("homePanels").style.display="none";
+  $("results").style.display="none";
+  $("view").style.display="none";
+  $("collectionView").style.display="block";
+
+  const isLibrary=type==="library";
+  const items=isLibrary?store(KEYS.lib):store(KEYS.hist);
+
+  $("collectionEyebrow").textContent=
+    isLibrary?"Your saved music":"Recently played";
+
+  $("collectionTitle").textContent=
+    isLibrary?"My Library":"Search History";
+
+  $("collectionCount").textContent=
+    items.length+" songs";
+
+  if(!items.length){
+    $("collectionList").innerHTML=
+      `<div class="collection-empty">
+        <b>${isLibrary?"Your library is empty":"No history yet"}</b>
+        ${isLibrary?"Save songs with ♡ Save and they will appear here.":"Open songs and they will appear here."}
+      </div>`;
+  }else{
+    $("collectionList").innerHTML=items.map((x,i)=>`
+      <button class="item collection-item" data-i="${i}">
+        <img class="thumb" src="${esc(x.art||"")}" onerror="this.style.visibility='hidden'">
+        <span>
+          <strong class="songname">${esc(x.trackName)}</strong>
+          <small class="meta">${esc(x.artistName)} · ${esc(x.albumName||"Single")}</small>
+        </span>
+        <span class="arrow">›</span>
+      </button>
+    `).join("");
+
+    document.querySelectorAll(".collection-item").forEach(b=>{
+      b.onclick=()=>{
+        const i=Number(b.dataset.i);
+        const song=items[i];
+        if(!song)return;
+        results=[song];
+        openSong(0);
+      };
+    });
+  }
+
+  if(push){
+    history.pushState(
+      {songsWorld:true,page:type},
+      "",
+      "#"+type
+    );
+  }
+}
+
+function showResults(push=true){
+  stopSync();
+  $("homePanels").style.display="none";
+  $("collectionView").style.display="none";
+  $("view").style.display="none";
+  $("results").style.display="block";
+  render();
+
+  if(push){
+    history.pushState(
+      {songsWorld:true,page:"results"},
+      "",
+      "#results"
+    );
+  }
+}
+
+function restoreRoute(state){
+  const page=state?.page;
+
+  if(page==="library"){
+    showCollection("library",false);
+    return;
+  }
+
+  if(page==="history"){
+    showCollection("history",false);
+    return;
+  }
+
+  if(page==="results"){
+    showResults(false);
+    return;
+  }
+
+  if(page==="song"){
+    // The current song remains in `current`; reopen it without adding
+    // another browser-history entry.
+    if(current){
+      const i=results.findIndex(x=>String(x.id)===String(current.id));
+      if(i>=0){
+        openSong(i,false);
+        return;
+      }
+    }
+  }
+
+  showHome(false);
+}
+
+window.addEventListener("popstate",e=>{
+  restoreRoute(e.state);
+});
+
+if(!history.state?.songsWorld){
+  history.replaceState(
+    {songsWorld:true,page:"home"},
+    "",
+    "#home"
+  );
+}
+
+$("back").onclick=()=>{
+  if(history.length>1){
+    history.back();
+  }else{
+    showHome();
+  }
+};
+
+$("homeBtn").onclick=()=>showHome();
+$("trendBtn").onclick=()=>showHome();
+$("libBtn").onclick=()=>showCollection("library");
+$("histBtn").onclick=()=>showCollection("history");
+
 $("mode").onchange=e=>{mode=e.target.value;renderLyrics()};
 $("sync").onclick=()=>{updateLyricsFromYouTube();startSync()};
 $("play").onclick=playPreview;
