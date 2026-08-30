@@ -368,6 +368,7 @@ async function loadLyrics(song){
 async function openSong(index){
  const song=results[index];if(!song)return;
  current=song;
+  updateSaveButton();
  const h=store(KEYS.hist).filter(x=>x.id!==song.id);h.unshift(song);put(KEYS.hist,h);
 
  $("homePanels").style.display="none";
@@ -417,20 +418,29 @@ $("histBtn").onclick=()=>{showHome();document.querySelectorAll(".section")[2]?.s
 $("mode").onchange=e=>{mode=e.target.value;renderLyrics()};
 $("sync").onclick=()=>{updateLyricsFromYouTube();startSync()};
 $("play").onclick=playPreview;
+function updateSaveButton(){
+  if(!current)return;
+  const lib=store(KEYS.lib);
+  const saved=lib.some(x=>String(x.id)===String(current.id));
+  $("save").textContent=saved?"✓ Saved":"♡ Save";
+}
+
 $("save").onclick=()=>{
   if(!current)return;
 
   const lib=store(KEYS.lib);
-  const exists=lib.some(x=>x.id===current.id);
+  const id=String(current.id);
+  const index=lib.findIndex(x=>String(x.id)===id);
 
-  if(exists){
-    $("save").textContent="✓ Saved";
-    return;
+  if(index>=0){
+    lib.splice(index,1);
+    put(KEYS.lib,lib);
+  }else{
+    lib.unshift(current);
+    put(KEYS.lib,lib);
   }
 
-  lib.unshift(current);
-  put(KEYS.lib,lib);
-  $("save").textContent="✓ Saved";
+  updateSaveButton();
   renderHome();
 };
 $("closeaudio").onclick=()=>{if(previewAudio)try{previewAudio.pause()}catch{}$("audioBar").style.display="none"};
