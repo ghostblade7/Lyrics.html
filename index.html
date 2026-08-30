@@ -1,0 +1,1175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Songs World — Find the words behind the music</title>
+<meta name="description" content="Songs World — search songs and discover their lyrics.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&family=Playfair+Display:wght@600;700;800&display=swap');
+
+:root{
+  --ink:#171414;
+  --paper:#f5efe5;
+  --cream:#fffaf1;
+  --red:#b6402f;
+  --orange:#d97b35;
+  --muted:#766e65;
+  --line:rgba(23,20,20,.14);
+  --shadow:0 22px 60px rgba(45,31,20,.12);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+
+body{
+  background:
+    radial-gradient(circle at 8% 18%,rgba(247,163,75,.18),transparent 24%),
+    radial-gradient(circle at 92% 20%,rgba(207,74,62,.17),transparent 26%),
+    radial-gradient(circle at 65% 78%,rgba(121,80,151,.10),transparent 28%),
+    linear-gradient(135deg,#f7efe5 0%,#f8e9df 46%,#f4eee4 100%);
+}
+.hero{background:
+  radial-gradient(circle at 50% 43%,rgba(255,255,255,.76),transparent 38%),
+  radial-gradient(circle at 18% 72%,rgba(245,154,63,.12),transparent 23%),
+  radial-gradient(circle at 86% 64%,rgba(173,70,110,.11),transparent 25%);
+}
+.eyebrow{color:#a8443b}
+h1 em{background:linear-gradient(105deg,#b6402f,#d76d35 55%,#9d456e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.logo span{background:linear-gradient(100deg,#b6402f,#d16d34);-webkit-background-clip:text;background-clip:text;color:transparent}
+.examples button{color:#a8443b}
+body{
+  margin:0;color:var(--ink);background:
+  radial-gradient(circle at 12% 8%,rgba(217,123,53,.13),transparent 28%),
+  radial-gradient(circle at 90% 28%,rgba(182,64,47,.09),transparent 26%),
+  var(--paper);
+  font-family:"DM Sans",sans-serif;
+}
+body:before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.18;
+  background-image:url("data:image/svg+xml,%3Csvg width='140' height='140' viewBox='0 0 140 140' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.08'/%3E%3C/svg%3E");
+  mix-blend-mode:multiply;z-index:10
+}
+body{overflow-x:hidden}
+.ambient{position:fixed;inset:0;pointer-events:none;overflow:hidden;z-index:0}
+#soundCanvas{position:absolute;inset:0;width:100%;height:100%;opacity:.25}
+.ambient-orbit{position:absolute;border:1px solid rgba(182,64,47,.12);border-radius:50%;animation:orbitDrift 18s linear infinite}
+.orbit-a{width:430px;height:430px;left:-170px;top:18%;transform:rotate(22deg)}
+.orbit-b{width:620px;height:620px;right:-280px;top:6%;animation-duration:25s;animation-direction:reverse}
+.orbit-c{width:260px;height:260px;right:16%;bottom:-140px;animation-duration:14s}
+.ambient-dot{position:absolute;width:7px;height:7px;border-radius:50%;background:var(--red);opacity:.35;box-shadow:0 0 0 8px rgba(182,64,47,.05);animation:dotFloat 6s ease-in-out infinite}
+.dot-a{left:14%;top:42%}.dot-b{right:18%;top:36%;animation-delay:1.4s}.dot-c{left:28%;bottom:18%;animation-delay:2.8s}.dot-d{right:8%;bottom:28%;animation-delay:4s}
+@keyframes orbitDrift{from{transform:rotate(0deg) translateX(0)}50%{transform:rotate(180deg) translateX(28px)}to{transform:rotate(360deg) translateX(0)}}
+@keyframes dotFloat{50%{transform:translateY(-22px) scale(1.35);opacity:.7}}
+nav,.hero,.content,footer{position:relative;z-index:1}
+.hero{background:radial-gradient(circle at 50% 48%,rgba(255,250,241,.72),transparent 43%)}
+.pulse-dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--red);vertical-align:middle;animation:pulse 1.5s ease-in-out infinite}
+@keyframes pulse{50%{transform:scale(1.8);box-shadow:0 0 0 7px rgba(182,64,47,.08)}}
+.hero-wave{height:40px;display:flex;align-items:center;justify-content:center;gap:5px;margin:-5px auto 27px;opacity:.72}
+.hero-wave span{width:3px;height:12px;border-radius:99px;background:var(--red);animation:eq 1.1s ease-in-out infinite}
+.hero-wave span:nth-child(2){animation-delay:-.75s;height:23px}.hero-wave span:nth-child(3){animation-delay:-.45s;height:31px}
+.hero-wave span:nth-child(4){animation-delay:-.2s;height:18px}.hero-wave span:nth-child(5){animation-delay:-.9s;height:35px}
+.hero-wave span:nth-child(6){animation-delay:-.6s;height:20px}.hero-wave span:nth-child(7){animation-delay:-.1s;height:29px}
+.hero-wave span:nth-child(8){animation-delay:-.8s;height:13px}.hero-wave span:nth-child(9){animation-delay:-.35s;height:27px}
+.hero-wave span:nth-child(10){animation-delay:-.65s;height:35px}.hero-wave span:nth-child(11){animation-delay:-.15s;height:18px}
+.hero-wave span:nth-child(12){animation-delay:-.55s;height:26px}.hero-wave span:nth-child(13){animation-delay:-.25s;height:12px}
+@keyframes eq{0%,100%{transform:scaleY(.45)}50%{transform:scaleY(1.45)}}
+.search{transition:transform .3s ease,box-shadow .3s ease}
+.search:focus-within{transform:translateY(-3px);box-shadow:0 25px 65px rgba(45,31,20,.16),0 0 0 5px rgba(182,64,47,.06)}
+.search button{position:relative;overflow:hidden}
+.search button:after{content:"";position:absolute;inset:-80% 40%;background:rgba(255,255,255,.16);transform:rotate(25deg) translateX(-150%);animation:buttonShine 4s ease-in-out infinite}
+@keyframes buttonShine{0%,55%{transform:rotate(25deg) translateX(-150%)}72%,100%{transform:rotate(25deg) translateX(260%)}}
+.result-item{position:relative;overflow:hidden}
+.result-item:after{content:"";position:absolute;left:-30%;top:0;width:20%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.42),transparent);transform:skewX(-18deg);transition:.6s}
+.result-item:hover:after{left:115%}
+.thumb{transition:transform .3s ease}.result-item:hover .thumb{transform:scale(1.04) rotate(-1deg)}
+.card{transition:box-shadow .35s ease,border-color .35s ease}
+.lyrics{position:relative;overflow:hidden}
+.lyrics:before{content:"♪";position:absolute;right:7%;top:6%;font:120px "Playfair Display";color:rgba(182,64,47,.06);transform:rotate(12deg);animation:watermark 8s ease-in-out infinite}
+@keyframes watermark{50%{transform:rotate(-5deg) translateY(14px)}}
+.back-btn{transition:transform .2s ease}.back-btn:hover{transform:translateX(-4px)}
+@media(prefers-reduced-motion:reduce){
+  *,*:before,*:after{animation-duration:.001ms!important;animation-iteration-count:1!important;scroll-behavior:auto!important;transition:none!important}
+}
+
+nav{
+  height:82px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 clamp(20px,6vw,90px);border-bottom:1px solid var(--line);
+}
+.logo{font-family:"Playfair Display";font-size:25px;font-weight:800;letter-spacing:-.7px}
+.logo span{color:var(--red)}
+.nav-note{font-size:12px;text-transform:uppercase;letter-spacing:2px;color:var(--muted)}
+.hero{
+  min-height:570px;display:grid;place-items:center;text-align:center;
+  padding:65px 20px 75px;position:relative;overflow:hidden
+}
+.hero-inner{max-width:920px;position:relative;z-index:2}
+.eyebrow{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--red);font-weight:700;margin-bottom:20px}
+h1{
+  font-family:"Playfair Display";font-size:clamp(58px,10vw,132px);line-height:.86;
+  letter-spacing:-6px;margin:0 0 28px
+}
+h1 em{font-weight:600;color:var(--red);font-style:italic}
+.tagline{font-size:17px;color:var(--muted);max-width:570px;margin:0 auto 34px;line-height:1.65}
+.search-wrap{max-width:700px;margin:auto;position:relative}
+.search{
+  display:flex;align-items:center;background:var(--cream);border:1px solid rgba(23,20,20,.22);
+  border-radius:999px;padding:7px 8px 7px 22px;box-shadow:var(--shadow)
+}
+.search input{border:0;outline:0;background:transparent;font:500 16px "DM Sans";width:100%;color:var(--ink)}
+.search button{
+  border:0;background:var(--ink);color:white;border-radius:999px;padding:14px 24px;
+  font:700 13px "DM Sans";cursor:pointer;transition:.2s
+}
+.search button:hover{background:var(--red);transform:translateY(-1px)}
+.examples{margin-top:14px;font-size:12px;color:var(--muted)}
+.examples button{border:0;background:none;color:var(--red);cursor:pointer;font:inherit;text-decoration:underline}
+.notes{position:absolute;inset:0;pointer-events:none;opacity:.28}
+.note{position:absolute;font-family:serif;font-size:70px;color:var(--red);animation:float 7s ease-in-out infinite}
+.n1{left:7%;top:18%;transform:rotate(-15deg)}.n2{right:9%;top:22%;font-size:100px;animation-delay:1s}
+.n3{left:18%;bottom:7%;font-size:55px;animation-delay:2s}.n4{right:20%;bottom:10%;animation-delay:3s}
+@keyframes float{50%{transform:translateY(-13px) rotate(5deg)}}
+.content{max-width:1100px;margin:auto;padding:0 20px 90px}
+.result-grid{display:grid;grid-template-columns:330px 1fr;gap:25px;align-items:start}
+.card{background:var(--cream);border:1px solid var(--line);border-radius:26px;box-shadow:var(--shadow)}
+.song-card{padding:27px;position:sticky;top:20px}
+.album{
+  width:100%;aspect-ratio:1;background:
+  linear-gradient(135deg,#191514,#533027 45%,#d97b35 46%,#b6402f);
+  border-radius:18px;display:grid;place-items:center;overflow:hidden;position:relative
+}
+.album:before,.album:after{content:"";position:absolute;border:1px solid rgba(255,255,255,.2);border-radius:50%}
+.album:before{width:72%;aspect-ratio:1}.album:after{width:46%;aspect-ratio:1}
+.vinyl{width:28%;aspect-ratio:1;border-radius:50%;background:#171414;position:relative;z-index:2;display:grid;place-items:center}
+.vinyl:after{content:"";width:24%;aspect-ratio:1;border-radius:50%;background:var(--orange)}
+.song-meta{padding-top:22px}.label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)}
+.song-title{font-family:"Playfair Display";font-size:31px;line-height:1.05;margin:7px 0}
+.artist{color:var(--red);font-weight:700}
+.status{margin-top:22px;padding:11px 13px;border-radius:12px;background:#f0e7da;color:var(--muted);font-size:12px;line-height:1.5}
+.lyrics{padding:38px clamp(25px,5vw,65px);min-height:550px}
+.lyrics-head{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:20px;margin-bottom:28px}
+.lyrics-head h2{font-family:"Playfair Display";font-size:38px;margin:0}
+.badge{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;border:1px solid var(--line);border-radius:999px;padding:8px 11px;color:var(--muted)}
+.lyric-lines{font-family:"Playfair Display";font-size:21px;line-height:1.8;white-space:pre-wrap}
+.lyric-lines .line{margin:0 0 5px}
+.placeholder{display:grid;place-items:center;min-height:450px;text-align:center;color:var(--muted)}
+.placeholder .big-note{font-size:65px;color:var(--red);font-family:serif}
+.placeholder p{max-width:430px;line-height:1.6}
+.loading{display:none;text-align:center;padding:80px;color:var(--muted)}
+.spinner{display:inline-block;width:30px;height:30px;border:3px solid #ddd2c5;border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+.error{display:none;padding:22px;background:#f7dfd8;border:1px solid #e7b6aa;border-radius:15px;color:#733125;margin-bottom:20px}.results-top{display:flex;align-items:end;justify-content:space-between;margin:0 0 18px;padding:0 5px}
+.results-top h2{font-family:"Playfair Display";font-size:38px;margin:5px 0 0}
+.result-count{font-size:12px;color:var(--muted);padding-bottom:5px}
+.result-list{display:grid;gap:10px;max-width:900px}
+#searchResults{padding-bottom:22px}
+.result-item{min-height:84px}
+
+.result-item{
+  width:100%;border:1px solid var(--line);background:rgba(255,250,241,.88);
+  border-radius:18px;padding:12px 15px;display:grid;grid-template-columns:62px 1fr auto;
+  align-items:center;gap:15px;text-align:left;cursor:pointer;transition:.18s;
+}
+.result-item:hover{transform:translateX(4px);box-shadow:0 12px 30px rgba(45,31,20,.09);border-color:rgba(182,64,47,.35)}
+.thumb{width:62px;height:62px;border-radius:12px;display:grid;place-items:center;position:relative;overflow:hidden;background:linear-gradient(135deg,#1b1715,#6a382d 55%,#d97b35);background-size:cover;background-position:center}
+.thumb:before{content:"";position:absolute;width:46px;height:46px;border:1px solid rgba(255,255,255,.25);border-radius:50%}
+.thumb .mini-vinyl{width:17px;height:17px;border-radius:50%;background:#171414;z-index:2}
+.thumb-play{position:absolute;right:6px;bottom:6px;width:25px;height:25px;border-radius:50%;display:grid;place-items:center;background:rgba(20,17,16,.86);color:#fff;font-size:10px;padding-left:1px;box-shadow:0 3px 10px rgba(0,0,0,.2)}
+.fallback-art{background:linear-gradient(135deg,#201716,#b6402f,#d97b35)!important;color:#fff;font:28px "Playfair Display";display:grid;place-items:center}
+
+
+.r-title{font-family:"Playfair Display";font-size:20px;line-height:1.1;margin-bottom:4px}
+.r-artist{font-size:13px;color:var(--red);font-weight:700}
+.r-album{font-size:11px;color:var(--muted);margin-top:3px}
+.r-arrow{font-size:22px;color:var(--muted);padding:0 5px}
+.back-btn{border:0;background:none;padding:0 0 20px;color:var(--red);font:700 12px "DM Sans";cursor:pointer;text-align:left}
+@media(max-width:760px){
+  .results-top h2{font-size:31px}.result-item{grid-template-columns:52px 1fr auto;padding:10px}
+  .thumb{width:52px;height:52px}.r-title{font-size:18px}.r-arrow{font-size:18px}
+}
+footer{border-top:1px solid var(--line);padding:28px 20px;text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:760px){
+  nav{height:68px;padding:0 20px}.nav-note{display:none}
+  .logo{font-size:23px}
+  h1{font-size:clamp(51px,15vw,78px);letter-spacing:-3.5px;margin-bottom:20px}
+  .hero{min-height:455px;padding:42px 18px 55px}
+  .eyebrow{font-size:10px;letter-spacing:2.5px;line-height:1.7;max-width:340px;margin:0 auto 15px}
+  .tagline{font-size:15px;line-height:1.55;margin-bottom:27px}
+  .hero-wave{margin:-3px auto 22px}
+  .search{padding-left:15px}.search input{font-size:16px;min-width:0}.search button{padding:13px 16px}
+  .examples{line-height:1.8}
+  .result-grid{grid-template-columns:1fr}.song-card{position:static}
+  .song-card{padding:18px}
+  .album{max-width:210px;margin:auto}.song-meta{text-align:center}
+  .lyrics{padding:28px 22px}.lyrics-head h2{font-size:31px}.badge{display:none}
+  .results-top{align-items:center;margin-bottom:13px}.results-top h2{font-size:30px}
+  .result-item{grid-template-columns:54px minmax(0,1fr) auto;min-height:72px;padding:9px 10px;border-radius:16px;gap:11px}
+  .thumb{width:54px;height:54px;border-radius:10px}
+  .r-title{font-size:17px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r-artist{font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r-album{font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .r-arrow{font-size:20px}
+  #searchResults{padding-bottom:8px}
+  .ambient-orbit{opacity:.6}
+  .orbit-a{width:300px;height:300px;left:-170px}
+  .orbit-b{width:420px;height:420px;right:-240px}
+  #soundCanvas{opacity:.16}
+              .player-timeline input{min-width:0}
+      .lyrics-view{padding-bottom:210px}
+  .suggestions{top:61px}
+}
+
+.search-wrap{z-index:30}
+.search-icon{font-size:22px;color:var(--red);margin-right:7px}
+.suggestions{position:absolute;left:0;right:0;top:65px;background:rgba(255,250,241,.98);border:1px solid var(--line);border-radius:20px;padding:7px;box-shadow:0 20px 55px rgba(45,31,20,.18);display:none;overflow:hidden}
+.suggestions.visible{display:block;animation:dropIn .18s ease-out}
+.suggestion{width:100%;display:grid;grid-template-columns:48px minmax(0,1fr) 25px;align-items:center;gap:11px;padding:7px;border:0;background:transparent;border-radius:13px;text-align:left;cursor:pointer}
+.suggestion:hover,.suggestion:focus{background:#f1e1d2;outline:none}
+.suggestion img{width:48px;height:48px;border-radius:9px;object-fit:cover}
+.suggest-text{min-width:0}.suggest-text strong,.suggest-text small{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.suggest-text strong{font-size:14px}.suggest-text small{font-size:11px;color:var(--red);margin-top:3px}
+.suggest-arrow{color:var(--muted)}
+.suggest-loading{text-align:center;color:var(--muted);font-size:12px;padding:12px}
+.suggest-loading span{display:inline-block;width:5px;height:5px;border-radius:50%;background:var(--red);margin:0 2px;animation:blink .8s infinite}
+.suggest-loading span:nth-child(2){animation-delay:.15s}.suggest-loading span:nth-child(3){animation-delay:.3s}
+@keyframes blink{50%{transform:translateY(-4px);opacity:.3}}
+@keyframes dropIn{from{opacity:0;transform:translateY(-5px)}to{opacity:1;transform:none}}
+
+.player-info strong,.player-info small{max-width:100%}
+
+@media(max-width:760px){
+  }
+
+.youtube-player-wrap{display:none;margin:0 0 30px;border-radius:22px;overflow:hidden;background:#111;box-shadow:0 20px 55px rgba(30,20,15,.22);border:1px solid rgba(255,255,255,.08)}
+.youtube-player-wrap.active{display:block;animation:dropIn .25s ease-out}
+.youtube-player-title{display:flex;justify-content:space-between;align-items:center;padding:11px 15px;color:#fff;font-size:9px;letter-spacing:2px;background:linear-gradient(90deg,#191414,#30201c)}
+.youtube-player-title small{font-size:9px;letter-spacing:.2px;color:#cfc5bd}
+.youtube-frame{position:relative;width:100%;aspect-ratio:16/9;background:#000}
+.youtube-frame iframe{position:absolute;inset:0;width:100%;height:100%;border:0;display:none}
+.youtube-frame iframe.ready{display:block}
+
+@media(max-width:760px){
+  .youtube-player-wrap{margin:0 -2px 24px;border-radius:17px}
+}
+
+.lyrics-toolbar{display:flex;align-items:center;justify-content:space-between;margin:0 0 10px;color:var(--muted);font-size:9px;letter-spacing:1.8px}
+.sync-btn{border:1px solid rgba(182,64,47,.3);background:transparent;color:var(--red);border-radius:999px;padding:7px 11px;font-size:9px;letter-spacing:1.2px;cursor:pointer}
+.sync-btn:hover{background:#f2e2d4}
+.lyrics-sync{max-height:62vh;overflow:auto;padding:12px 4px 90px;scroll-behavior:smooth}
+.lyric-line{display:block;width:100%;border:0;background:transparent;text-align:left;font:inherit;color:rgba(42,35,30,.32);padding:10px 4px;cursor:pointer;transition:all .22s ease}
+.lyric-line:hover{color:rgba(42,35,30,.7)}
+.lyric-line.current{color:var(--red);font-weight:700;font-size:1.14em;transform:translateX(5px)}
+.plain-line{min-height:1.5em;margin:0 0 8px}
+.lyrics-empty{color:var(--muted);padding:30px 0}
+
+.lyrics-language{display:flex;align-items:center;gap:8px;min-width:0}
+.lyrics-language label{font-size:8px;letter-spacing:1.2px;color:var(--muted)}
+.lyrics-language select{border:1px solid rgba(182,64,47,.25);background:#fff8f0;color:var(--ink);border-radius:999px;padding:6px 25px 6px 9px;font-size:10px;outline:none}
+.lyrics-language select:focus{box-shadow:0 0 0 3px rgba(182,64,47,.08)}
+@media(max-width:760px){
+  .lyrics-toolbar{align-items:flex-start;gap:8px}
+  .lyrics-language{flex-wrap:wrap}.lyrics-language label{display:none}
+  .lyrics-language select{max-width:125px}
+}
+
+.youtube-local-fallback{display:none;position:absolute;inset:0;background:radial-gradient(circle at 72% 45%,#39204a 0%,#171313 45%,#090909 100%);color:#fff;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:8px;padding:20px}
+.youtube-local-fallback.visible{display:flex}
+.yt-fallback-icon{width:54px;height:38px;border-radius:11px;background:#f20d27;display:grid;place-items:center;font-size:20px;padding-left:2px}
+.youtube-local-fallback strong{font-size:18px}.youtube-local-fallback span{font-size:11px;color:#c7bfba}
+.youtube-local-fallback a{margin-top:8px;background:#fff;color:#161313;border-radius:999px;padding:10px 16px;font-size:10px;font-weight:700;text-decoration:none}
+
+.youtube-search-card{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;text-align:center;gap:8px;padding:20px;background:radial-gradient(circle at 72% 42%,#38204a 0%,#171313 45%,#090909 100%);color:#fff}
+.youtube-search-card strong{font-size:18px}.youtube-search-card span{font-size:11px;color:#c8bfba}
+.youtube-search-card.visible{display:flex}
+.youtube-search-card a{margin-top:8px;background:#fff;color:#151313;border-radius:999px;padding:11px 17px;font-size:10px;font-weight:800;text-decoration:none}
+
+.lyrics-options{display:flex;align-items:center;gap:8px}
+.lyrics-options span{font-size:8px;letter-spacing:1.5px;color:var(--muted)}
+.lyrics-options select{border:1px solid rgba(182,64,47,.25);background:#fff8ef;color:#2b2420;border-radius:999px;padding:8px 26px 8px 10px;font-size:10px;outline:none}
+@media(max-width:760px){.lyrics-options span{display:none}.lyrics-options select{font-size:9px;padding:7px 22px 7px 9px}}
+</style>
+</head>
+<body>
+<div class="ambient" aria-hidden="true">
+  <div class="ambient-orbit orbit-a"></div>
+  <div class="ambient-orbit orbit-b"></div>
+  <div class="ambient-orbit orbit-c"></div>
+  <div class="ambient-dot dot-a"></div><div class="ambient-dot dot-b"></div>
+  <div class="ambient-dot dot-c"></div><div class="ambient-dot dot-d"></div>
+  <canvas id="soundCanvas"></canvas>
+</div>
+<nav>
+  <div class="logo">Songs<span>World</span>.</div>
+  <div class="nav-note">words worth remembering</div>
+</nav>
+
+<section class="hero">
+  <div class="notes" aria-hidden="true">
+    <div class="note n1">♪</div><div class="note n2">♫</div>
+    <div class="note n3">♩</div><div class="note n4">♪</div>
+  </div>
+  <div class="hero-inner">
+    <div class="eyebrow"><span class="pulse-dot"></span> A little library for the songs in your head <span class="pulse-dot"></span></div>
+    <h1>Find the <em>words.</em></h1>
+    <div class="hero-wave" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+    <p class="tagline">Type a song. Follow the melody. Read the lyrics without digging through a dozen tabs.</p>
+    <form class="search-wrap" id="searchForm">
+      <div class="search">
+        <span class="search-icon">⌕</span>
+        <input id="query" autocomplete="off" placeholder="Search songs, artists, albums…" aria-label="Song search">
+        <button type="submit">SEARCH</button>
+      </div>
+      <div class="suggestions" id="suggestions" aria-live="polite"></div>
+      <div class="examples">Try <button type="button" onclick="fillSearch('Blinding Lights')">Blinding Lights</button> · <button type="button" onclick="fillSearch('Arijit Singh')">Arijit Singh</button> · <button type="button" onclick="fillSearch('Perfect Ed Sheeran')">Perfect — Ed Sheeran</button></div>
+    </form>
+  </div>
+</section>
+
+
+<main class="content">
+  <div class="error" id="error"></div>
+  <div class="loading" id="loading"><div class="spinner"></div><p>Finding the right record…</p></div>
+  <section id="searchResults" style="display:none">
+    <div class="results-top">
+      <div>
+        <div class="label">Search results</div>
+        <h2>Closest matches</h2>
+      </div>
+      <div class="result-count" id="resultCount"></div>
+    </div>
+    <div class="result-list" id="resultList"></div>
+  </section>
+
+  <div class="result-grid" id="lyricsView" style="display:none">
+    <aside class="card song-card">
+      <button class="back-btn" onclick="showSearchResults()">← Back to results</button>
+      <div class="album" id="albumArt"><div class="vinyl"></div></div>
+      <div class="song-meta">
+        <div class="label">Selected song</div>
+        <div class="song-title" id="songTitle">—</div>
+        <div class="artist" id="artistName">—</div>
+        <div class="status" id="sourceStatus">Lyrics fetched from LRCLIB.</div>
+      </div>
+    </aside>
+    <article class="card lyrics">
+      <div class="youtube-player-wrap" id="youtubePlayerWrap">
+  <div class="youtube-player-title"><span>NOW PLAYING</span><small id="embedNote">YouTube</small></div>
+  <div class="youtube-frame">
+    <iframe id="youtubePlayer"
+      title="YouTube music player"
+      src=""
+      allow="autoplay; encrypted-media; picture-in-picture"
+      allowfullscreen
+      loading="lazy"></iframe>
+    <div class="youtube-search-card" id="youtubeSearchCard">
+      <div class="yt-fallback-icon">▶</div>
+      <strong id="youtubeCardTitle">Find this song on YouTube</strong>
+      <span id="youtubeCardArtist">Selected song</span>
+      <a id="youtubeCardLink" target="_blank" rel="noopener">WATCH ON YOUTUBE ↗</a>
+    </div>
+  </div>
+</div>
+<div class="lyrics-head">
+        <div><div class="label">The words</div><h2>Lyrics</h2></div>
+        <div class="lyrics-options">
+          <span>SHOW AS</span>
+          <select id="lyricsLanguage" aria-label="Lyrics display language">
+            <option value="original">Original script</option>
+            <option value="roman">English letters</option>
+            <option value="english">English translation</option>
+          </select>
+        </div>
+      </div>
+      <div class="lyric-lines" id="lyricsText"></div>
+    </article>
+  </div>
+
+  <div class="card placeholder" id="placeholder">
+    <div>
+      <div class="big-note">♫</div>
+      <h2 style="font-family:'Playfair Display';font-size:32px;margin:8px 0">What are you listening to?</h2>
+      <p>Search above and Songs World will look for the closest match. For best results, include the artist name.</p>
+    </div>
+  </div>
+</main>
+
+<footer>© 2026 Songs World · YouTube discovery · LRCLIB lyrics · Built for people who read songs as much as they hear them.</footer>
+
+<script>
+// Songs World uses Apple's public iTunes Search API for music discovery.
+// It needs no developer key and provides artwork, artist metadata and previews.
+// LRCLIB is used only after a song is selected, for lyrics.
+const MUSIC_COUNTRY='IN';
+const MUSIC_LIMIT=50;
+const MOVIE_LIMIT=8;
+
+const form=document.getElementById('searchForm');
+const input=document.getElementById('query');
+const suggestions=document.getElementById('suggestions');
+const loading=document.getElementById('loading');
+const searchResults=document.getElementById('searchResults');
+const resultList=document.getElementById('resultList');
+const resultCount=document.getElementById('resultCount');
+const lyricsView=document.getElementById('lyricsView');
+const placeholder=document.getElementById('placeholder');
+const errorBox=document.getElementById('error');
+const titleEl=document.getElementById('songTitle');
+const artistEl=document.getElementById('artistName');
+const lyricsEl=document.getElementById('lyricsText');
+const statusEl=document.getElementById('sourceStatus');
+
+let currentResults=[];
+let currentLyricsData=null;
+let selectedLyricsMode='original';
+let syncedLines=[];
+let syncTimer=null;
+let userLyricsScroll=false;
+
+let suggestionTimer=null;
+
+function fillSearch(text){
+  input.value=text;
+  input.focus();
+  showSuggestions(text);
+}
+
+function escapeHtml(value){
+  return String(value??'').replace(/[&<>"']/g,c=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'
+  }[c]));
+}
+
+function normalize(value){
+  return String(value||'').toLowerCase()
+    .replace(/&/g,'and')
+    .replace(/[^\p{L}\p{N}\s]/gu,' ')
+    .replace(/\s+/g,' ')
+    .trim();
+}
+
+function scoreResult(item,q){
+  const n=normalize(q),t=normalize(item.trackName),a=normalize(item.artistName);
+  let score=0;
+  if(t===n)score+=1200;
+  if(t.startsWith(n))score+=600;
+  if(t.includes(n))score+=350;
+  if(a===n)score+=300;
+  if(a.includes(n))score+=120;
+  if(item.preview)score+=15;
+  return score;
+}
+
+function searchJSONP(urlBase, params, timeoutMs=10000){
+  return new Promise((resolve,reject)=>{
+    const callbackName='songsWorld_'+Date.now()+'_'+Math.random().toString(36).slice(2);
+    const script=document.createElement('script');
+    let finished=false;
+    const cleanup=()=>{
+      if(script.parentNode)script.parentNode.removeChild(script);
+      try{delete window[callbackName]}catch(e){window[callbackName]=undefined}
+    };
+    const timer=setTimeout(()=>{
+      if(finished)return;
+      finished=true; cleanup();
+      reject(new Error('Search timed out.'));
+    },timeoutMs);
+
+    window[callbackName]=(data)=>{
+      if(finished)return;
+      finished=true; clearTimeout(timer); cleanup(); resolve(data||{});
+    };
+    script.onerror=()=>{
+      if(finished)return;
+      finished=true; clearTimeout(timer); cleanup();
+      reject(new Error('Search unavailable.'));
+    };
+
+    const query=new URLSearchParams({...params,callback:callbackName});
+    script.src=`${urlBase}?${query.toString()}`;
+    document.head.appendChild(script);
+  });
+}
+
+async function searchMusic(q){
+  const data=await searchJSONP('https://itunes.apple.com/search',{
+    term:q,country:MUSIC_COUNTRY,media:'music',entity:'song',limit:MUSIC_LIMIT,lang:'en_us'
+  });
+
+  const seen=new Set();
+  const results=(data.results||[])
+    .filter(x=>x.trackName&&x.artistName)
+    .map(x=>({
+      id:x.trackId,
+      trackName:x.trackName,
+      artistName:x.artistName,
+      albumName:x.collectionName||'',
+      artwork:(x.artworkUrl100||x.artworkUrl60||'').replace(/\/\d+x\d+bb\./,'/600x600bb.'),
+      preview:x.previewUrl||'',
+      storeUrl:x.trackViewUrl||'',
+      year:x.releaseDate?new Date(x.releaseDate).getFullYear():'',
+      duration:x.trackTimeMillis?Math.round(x.trackTimeMillis/1000):0,
+      genre:x.primaryGenreName||'Music',
+      isMovieSong:false,
+      movieName:''
+    }))
+    .filter(x=>{
+      const key=`${normalize(x.trackName)}|${normalize(x.artistName)}|${normalize(x.albumName)}`;
+      if(seen.has(key))return false;
+      seen.add(key);
+      return true;
+    })
+    .sort((a,b)=>scoreResult(b,q)-scoreResult(a,q));
+
+  // If the query looks like a film title, use Apple's movie catalog too.
+  // Then search the music catalog using the exact movie title to surface
+  // soundtrack songs even when the movie title itself isn't a track title.
+  try{
+    const movieData=await searchJSONP('https://itunes.apple.com/search',{
+      term:q,country:MUSIC_COUNTRY,media:'movie',entity:'movie',limit:MOVIE_LIMIT,lang:'en_us'
+    },7000);
+
+    const movies=(movieData.results||[]).filter(m=>m.trackName);
+    if(movies.length){
+      const exactMovie=movies
+        .sort((a,b)=>movieScore(b,q)-movieScore(a,q))[0];
+
+      const movieTitle=exactMovie.trackName;
+      const soundtrackData=await searchJSONP('https://itunes.apple.com/search',{
+        term:movieTitle,country:MUSIC_COUNTRY,media:'music',entity:'song',limit:50,lang:'en_us'
+      },8000);
+
+      const movieSongs=(soundtrackData.results||[])
+        .filter(x=>x.trackName&&x.artistName)
+        .map(x=>({
+          id:x.trackId,
+          trackName:x.trackName,
+          artistName:x.artistName,
+          albumName:x.collectionName||'',
+          artwork:(x.artworkUrl100||x.artworkUrl60||'').replace(/\/\d+x\d+bb\./,'/600x600bb.'),
+          preview:x.previewUrl||'',
+          storeUrl:x.trackViewUrl||'',
+          year:x.releaseDate?new Date(x.releaseDate).getFullYear():'',
+          duration:x.trackTimeMillis?Math.round(x.trackTimeMillis/1000):0,
+          genre:x.primaryGenreName||'Music',
+          isMovieSong:true,
+          movieName:movieTitle
+        }))
+        .filter(x=>{
+          const key=`${normalize(x.trackName)}|${normalize(x.artistName)}|${normalize(x.albumName)}`;
+          if(seen.has(key))return false;
+          seen.add(key);
+          return true;
+        });
+
+      // Put soundtrack matches first when the user searched a movie.
+      if(movieSongs.length){
+        return movieSongs
+          .sort((a,b)=>movieScore(b,q)-movieScore(a,q))
+          .concat(results)
+          .slice(0,50);
+      }
+    }
+  }catch(e){
+    // Music results remain usable even if movie lookup is unavailable.
+  }
+
+  return results;
+}
+
+function movieScore(x,q){
+  const n=normalize(q);
+  const t=normalize(x.trackName||x.movieName||'');
+  let score=0;
+  if(t===n)score+=1500;
+  if(t.startsWith(n))score+=700;
+  if(t.includes(n))score+=350;
+  return score;
+}
+
+function renderSuggestions(items){
+  suggestions.innerHTML=items.slice(0,6).map((x,i)=>`
+    <button type="button" class="suggestion" data-index="${i}">
+      <img src="${escapeHtml(x.artwork)}" alt="">
+      <span class="suggest-text">
+        <strong>${escapeHtml(x.trackName)}</strong>
+        <small>${escapeHtml(x.artistName)}</small>
+      </span>
+      <span class="suggest-arrow">↵</span>
+    </button>
+  `).join('');
+
+  suggestions.querySelectorAll('.suggestion').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const chosen=items[Number(btn.dataset.index)];
+      input.value=chosen.trackName;
+      hideSuggestions();
+      searchSong(`${chosen.trackName} ${chosen.artistName}`);
+    });
+  });
+}
+
+function showSuggestions(q){
+  clearTimeout(suggestionTimer);
+  if(!q.trim()){hideSuggestions();return;}
+
+  suggestions.innerHTML=`<div class="suggest-loading"><span></span><span></span><span></span> Finding songs…</div>`;
+  suggestions.classList.add('visible');
+
+  suggestionTimer=setTimeout(async()=>{
+    try{
+      // Suggestions stay fast: music catalog only; movie detection happens on Search.
+      const data=await searchJSONP('https://itunes.apple.com/search',{
+        term:q,country:MUSIC_COUNTRY,media:'music',entity:'song',limit:8,lang:'en_us'
+      },7000);
+      const seen=new Set();
+      const items=(data.results||[]).filter(x=>x.trackName&&x.artistName).map(x=>({
+        trackName:x.trackName,
+        artistName:x.artistName,
+        artwork:(x.artworkUrl100||x.artworkUrl60||'').replace(/\/\d+x\d+bb\./,'/600x600bb.')
+      })).filter(x=>{
+        const k=`${normalize(x.trackName)}|${normalize(x.artistName)}`;
+        if(seen.has(k))return false; seen.add(k); return true;
+      }).slice(0,6);
+
+      if(items.length)renderSuggestions(items);
+      else hideSuggestions();
+    }catch(e){hideSuggestions();}
+  },220);
+}
+
+function hideSuggestions(){
+  suggestions.classList.remove('visible');
+}
+
+async function searchSong(q){
+  errorBox.style.display='none';
+  placeholder.style.display='none';
+  lyricsView.style.display='none';
+  searchResults.style.display='none';
+  loading.style.display='block';
+  hideSuggestions();
+
+  try{
+    currentResults=await searchMusic(q);
+    if(!currentResults.length)throw new Error('No songs found. Try the song name with the artist.');
+
+    resultCount.textContent=`${currentResults.length} matches`;
+    resultList.innerHTML=currentResults.map((x,i)=>`
+      <button class="result-item" type="button" data-result="${i}">
+        <div class="thumb" style="background-image:url('${escapeHtml(x.artwork)}');background-size:cover;background-position:center">
+          ${x.preview?'<span class="thumb-play">▶</span>':''}
+        </div>
+        <div class="result-copy">
+          <div class="r-title">${escapeHtml(x.trackName)}</div>
+          <div class="r-artist">${escapeHtml(x.artistName)}</div>
+          <div class="r-album">${escapeHtml(x.albumName||'Single')}${x.year?` · ${x.year}`:''}</div>
+        </div>
+        <div class="r-arrow">›</div>
+      </button>
+    `).join('');
+
+    resultList.querySelectorAll('.result-item').forEach(btn=>{
+      btn.addEventListener('click',()=>openResult(Number(btn.dataset.result)));
+    });
+
+    searchResults.style.display='block';
+    window.scrollTo({top:searchResults.offsetTop-18,behavior:'smooth'});
+  }catch(err){
+    errorBox.textContent=(err&&err.message)||'Music search is temporarily unavailable. Please try again.';
+    errorBox.style.display='block';
+    placeholder.style.display='grid';
+  }finally{
+    loading.style.display='none';
+  }
+}
+
+async function lrclibRequest(url){
+  // Direct request works when Songs World is hosted normally.
+  // When opened as content://, browser CORS can block LRCLIB, so use
+  // a read-through fallback. This keeps the HTML file usable locally.
+  try{
+    const direct=await fetch(url,{headers:{'Accept':'application/json'}});
+    if(direct.ok)return await direct.json();
+  }catch(e){}
+
+  const proxied='https://r.jina.ai/'+url;
+  const response=await fetch(proxied,{headers:{'Accept':'application/json'}});
+  if(!response.ok)throw new Error('Lyrics service is temporarily unavailable.');
+
+  const text=await response.text();
+  try{
+    return JSON.parse(text);
+  }catch(e){
+    // Jina may wrap JSON as text/markdown; extract the JSON object/array.
+    const firstObject=text.indexOf('{');
+    const firstArray=text.indexOf('[');
+    const start=firstObject===-1?firstArray:
+      (firstArray===-1?firstObject:Math.min(firstObject,firstArray));
+    if(start>=0){
+      return JSON.parse(text.slice(start).trim());
+    }
+    throw new Error('Invalid lyrics response.');
+  }
+}
+
+function trackQuery(track){
+  return `"${track.trackName}" "${track.artistName}"`;
+}
+
+async function openResult(index){
+  const match=currentResults[index];
+  if(!match)return;
+
+  searchResults.style.display='none';
+  placeholder.style.display='none';
+  lyricsView.style.display='grid';
+
+  selectedLyricsMode='original';
+  const languageSelect=document.getElementById('lyricsLanguage');
+  if(languageSelect)languageSelect.value='original';
+
+  titleEl.textContent=match.trackName;
+  artistEl.textContent=match.artistName;
+
+  const album=document.getElementById('albumArt');
+  album.style.backgroundImage=`url("${match.artwork}")`;
+  album.style.backgroundSize='cover';
+  album.style.backgroundPosition='center';
+  album.querySelector('.vinyl').style.display='none';
+
+  // YouTube is now the only player on the lyrics page.
+  // Search embed resolves the selected song without requiring an API key.
+  const ytFrame=document.getElementById('youtubePlayer');
+  const ytWrap=document.getElementById('youtubePlayerWrap');
+  const ytCard=document.getElementById('youtubeSearchCard');
+  const ytCardLink=document.getElementById('youtubeCardLink');
+  const ytCardTitle=document.getElementById('youtubeCardTitle');
+  const ytCardArtist=document.getElementById('youtubeCardArtist');
+  const note=document.getElementById('embedNote');
+  const ytUrl=`https://www.youtube.com/results?search_query=${encodeURIComponent(trackQuery(match))}`;
+
+  if(ytWrap){
+    ytWrap.classList.add('active');
+    if(note)note.textContent=`${match.trackName} · ${match.artistName}`;
+    if(ytCardLink)ytCardLink.href=ytUrl;
+    if(ytCardTitle)ytCardTitle.textContent=match.trackName;
+    if(ytCardArtist)ytCardArtist.textContent=match.artistName;
+    if(ytCard)ytCard.classList.add('visible');
+    if(ytFrame){ytFrame.src='';ytFrame.classList.remove('ready');}
+  }
+
+  lyricsEl.textContent='Finding lyrics…';
+  statusEl.textContent='Matching this song with LRCLIB…';
+
+  window.scrollTo({top:lyricsView.offsetTop-18,behavior:'smooth'});
+
+  try{
+    let lyricsData=null;
+    let exact='https://lrclib.net/api/get'+
+      '?track_name='+encodeURIComponent(match.trackName)+
+      '&artist_name='+encodeURIComponent(match.artistName)+
+      '&album_name='+encodeURIComponent(match.albumName);
+    if(match.duration)exact+='&duration='+encodeURIComponent(match.duration);
+
+    try{
+      lyricsData=await lrclibRequest(exact);
+    }catch(e){
+      lyricsData=null;
+    }
+
+    if(!lyricsData||(!lyricsData.plainLyrics&&!lyricsData.syncedLyrics)){
+      try{
+        const fallbackUrl='https://lrclib.net/api/search?q='+
+          encodeURIComponent(`${match.trackName} ${match.artistName}`);
+        const candidates=await lrclibRequest(fallbackUrl);
+        if(Array.isArray(candidates)){
+          candidates.sort((a,b)=>lyricsScore(b,match)-lyricsScore(a,match));
+          lyricsData=candidates[0]||null;
+        }
+      }catch(e){}
+    }
+
+    if(!lyricsData||(!lyricsData.plainLyrics&&!lyricsData.syncedLyrics))
+      throw new Error('Full lyrics for this song were not found in LRCLIB.');
+
+    titleEl.textContent=lyricsData.trackName||match.trackName;
+    artistEl.textContent=lyricsData.artistName||match.artistName;
+
+    // Always render the complete lyrics payload. Plain lyrics are preferred;
+    // if LRCLIB only has synced lyrics, remove ALL timestamps without truncating.
+    currentLyricsData=lyricsData;
+
+    renderLyricsInSelectedLanguage(lyricsData);
+    if(lyricsData.syncedLyrics){
+      startLyricsSync();
+      statusEl.textContent=`Synced lyrics by LRCLIB${lyricsData.albumName?` · ${lyricsData.albumName}`:''}.`;
+    }else{
+      stopLyricsSync();
+      statusEl.textContent=`Full lyrics by LRCLIB${lyricsData.albumName?` · ${lyricsData.albumName}`:''}.`;
+    }
+  }catch(err){
+    lyricsEl.innerHTML='<div class="lyrics-empty">Lyrics could not be shown right now. Please try selecting the result again.</div>';
+    statusEl.textContent='LRCLIB could not be reached or did not have a matching lyrics record.';
+  }
+}
+
+function lyricsScore(x,m){
+  const t=normalize(x.trackName),a=normalize(x.artistName);
+  const mt=normalize(m.trackName),ma=normalize(m.artistName);
+  let n=0;
+  if(t===mt)n+=1000;
+  if(a===ma)n+=700;
+  if(t.includes(mt)||mt.includes(t))n+=250;
+  if(a.includes(ma)||ma.includes(a))n+=180;
+  if(x.plainLyrics)n+=50;
+  if(m.duration&&x.duration&&Math.abs(Number(x.duration)-m.duration)<=3)n+=300;
+  return n;
+}
+
+function formatDuration(seconds){
+  const n=Math.max(0,Number(seconds)||0);
+  return `${Math.floor(n/60)}:${String(Math.floor(n%60)).padStart(2,'0')}`;
+}
+
+function detectLyricsLanguage(text){
+  const t=String(text||'');
+  if(/[\u0900-\u097F]/.test(t))return 'hi';
+  if(/[\u0980-\u09FF]/.test(t))return 'bn';
+  if(/[\u0A00-\u0A7F]/.test(t))return 'pa';
+  if(/[\u0B80-\u0BFF]/.test(t))return 'ta';
+  if(/[\u0C00-\u0C7F]/.test(t))return 'te';
+  if(/[\u0C80-\u0CFF]/.test(t))return 'kn';
+  if(/[\u0D00-\u0D7F]/.test(t))return 'ml';
+  if(/[\u0A80-\u0AFF]/.test(t))return 'gu';
+  if(/[\u0B00-\u0B7F]/.test(t))return 'or';
+  return 'en';
+}
+
+function renderLyricsInSelectedLanguage(data){
+  const source=data.plainLyrics || cleanSyncedLyrics(data.syncedLyrics||'');
+  const lang=detectLyricsLanguage(source);
+
+  if(selectedLyricsMode==='original'){
+    if(data.syncedLyrics)renderSyncedLyrics(data.syncedLyrics);
+    else renderPlainLyrics(source);
+    return;
+  }
+
+  if(selectedLyricsMode==='roman'){
+    // Fully local romanization: no API/CORS request is needed.
+    const roman=localRomanize(source,lang);
+    renderPlainLyrics(roman);
+    statusEl.textContent=`English-letter lyrics · ${lang.toUpperCase()} · LRCLIB source`;
+    return;
+  }
+
+  // Translation is deliberately separate from Romanization.
+  // We don't silently replace lyrics with an unreliable translation.
+  renderPlainLyrics(source);
+  statusEl.textContent='English translation requires a translation service/API.';
+}
+
+function transliterateLyrics(text,lang){
+  return Promise.resolve(localRomanize(String(text||''),lang));
+}
+
+const DEV_VOWELS={
+  'अ':'a','आ':'aa','इ':'i','ई':'ee','उ':'u','ऊ':'oo','ऋ':'ri','ए':'e','ऐ':'ai','ओ':'o','औ':'au',
+  'ा':'aa','ि':'i','ी':'ee','ु':'u','ू':'oo','ृ':'ri','े':'e','ै':'ai','ो':'o','ौ':'au',
+  'ं':'n','ः':'h','ँ':'n','ऽ':"'"
+};
+const DEV_CONS={
+  'क':'k','ख':'kh','ग':'g','घ':'gh','ङ':'ng','च':'ch','छ':'chh','ज':'j','झ':'jh','ञ':'ny',
+  'ट':'t','ठ':'th','ड':'d','ढ':'dh','ण':'n','त':'t','थ':'th','द':'d','ध':'dh','न':'n',
+  'प':'p','फ':'ph','ब':'b','भ':'bh','म':'m','य':'y','र':'r','ल':'l','व':'v',
+  'श':'sh','ष':'sh','स':'s','ह':'h','ळ':'l','क्ष':'ksh','त्र':'tr','ज्ञ':'gy'
+};
+
+function romanizeDevanagari(text){
+  let out='', pending='';
+  const chars=[...text];
+  for(let i=0;i<chars.length;i++){
+    const c=chars[i], next=chars[i+1];
+    if(c==='्'){
+      pending+='|';
+      continue;
+    }
+    if(DEV_CONS[c]){
+      if(pending.endsWith('|')){
+        pending=pending.slice(0,-1);
+        out+=DEV_CONS[c];
+      }else{
+        out+=DEV_CONS[c];
+        // Default schwa. It is removed when followed by a virama or certain endings.
+        if(next!=='्' && next!=='ा' && next!=='ि' && next!=='ी' && next!=='ु' && next!=='ू' &&
+           next!=='ृ' && next!=='े' && next!=='ै' && next!=='ो' && next!=='ौ' && next!=='ं' &&
+           next!=='ः' && next!=='ँ' && next!==' ' && next!=='\\n' && next!==',' && next!=='.' &&
+           next!=='!' && next!=='?' && next!=='-' ){
+          out+='a';
+        }
+      }
+      continue;
+    }
+    if(DEV_VOWELS[c]){
+      out+=DEV_VOWELS[c];
+      continue;
+    }
+    if(c==='्')continue;
+    out+=c;
+  }
+  return tidyRoman(out);
+}
+
+function romanizeIndic(text,lang){
+  // Hindi/Marathi/Nepali scripts.
+  if(lang==='hi'||lang==='mr'||lang==='ne'||/[\u0900-\u097F]/.test(text))
+    return romanizeDevanagari(text);
+
+  // Bengali/Assamese: practical readable Romanization for lyrics.
+  const bn={
+    'অ':'o','আ':'a','ই':'i','ঈ':'ee','উ':'u','ঊ':'oo','এ':'e','ঐ':'oi','ও':'o','ঔ':'ou',
+    'া':'a','ি':'i','ী':'ee','ু':'u','ূ':'oo','ে':'e','ৈ':'oi','ো':'o','ৌ':'ou','ং':'ng','ঃ':'h','ঁ':'n',
+    'ক':'k','খ':'kh','গ':'g','ঘ':'gh','ঙ':'ng','চ':'ch','ছ':'chh','জ':'j','ঝ':'jh','ঞ':'n',
+    'ট':'t','ঠ':'th','ড':'d','ঢ':'dh','ণ':'n','ত':'t','থ':'th','দ':'d','ধ':'dh','ন':'n',
+    'প':'p','ফ':'ph','ব':'b','ভ':'bh','ম':'m','য':'j','র':'r','ল':'l','শ':'sh','ষ':'sh','স':'s','হ':'h','ড়':'r','ঢ়':'rh',
+    '্':''
+  };
+  if(lang==='bn'||/[\u0980-\u09FF]/.test(text))return tidyRoman([...text].map(c=>bn[c]??c).join(''));
+
+  // Punjabi/Gurmukhi.
+  const pa={
+    'ਅ':'a','ਆ':'aa','ਇ':'i','ਈ':'ee','ਉ':'u','ਊ':'oo','ਏ':'e','ਐ':'ai','ਓ':'o','ਔ':'au',
+    'ਾ':'aa','ਿ':'i','ੀ':'ee','ੁ':'u','ੂ':'oo','ੇ':'e','ੈ':'ai','ੋ':'o','ੌ':'au','ਂ':'n','ੰ':'n','ੱ':'',
+    'ਕ':'k','ਖ':'kh','ਗ':'g','ਘ':'gh','ਙ':'ng','ਚ':'ch','ਛ':'chh','ਜ':'j','ਝ':'jh','ਞ':'ny',
+    'ਟ':'t','ਠ':'th','ਡ':'d','ਢ':'dh','ਣ':'n','ਤ':'t','ਥ':'th','ਦ':'d','ਧ':'dh','ਨ':'n',
+    'ਪ':'p','ਫ':'f','ਬ':'b','ਭ':'bh','ਮ':'m','ਯ':'y','ਰ':'r','ਲ':'l','ਵ':'v','ਸ':'s','ਹ':'h',
+    'ਸ਼':'sh','ੜ':'r','ਖ਼':'kh','ਗ਼':'gh','ਜ਼':'z','ਫ਼':'f','ਲ਼':'l','੍':''
+  };
+  if(lang==='pa'||/[\u0A00-\u0A7F]/.test(text))return tidyRoman([...text].map(c=>pa[c]??c).join(''));
+
+  // Other Indic scripts: preserve Latin and provide a character-wise readable fallback.
+  const maps={
+    ta:{'அ':'a','ஆ':'aa','இ':'i','ஈ':'ee','உ':'u','ஊ':'oo','எ':'e','ஏ':'e','ஐ':'ai','ஒ':'o','ஓ':'o','ஔ':'au','க':'k','ங':'ng','ச':'ch','ஞ':'ny','ட':'t','ண':'n','த':'th','ந':'n','ப':'p','ம':'m','ய':'y','ர':'r','ல':'l','வ':'v','ழ':'zh','ள':'l','ற':'r','ன':'n','ஜ':'j','ஷ':'sh','ஸ':'s','ஹ':'h'},
+    te:{'అ':'a','ఆ':'aa','ఇ':'i','ఈ':'ee','ఉ':'u','ఊ':'oo','ఎ':'e','ఏ':'e','ఐ':'ai','ఒ':'o','ఓ':'o','ఔ':'au','క':'k','ఖ':'kh','గ':'g','ఘ':'gh','చ':'ch','జ':'j','ట':'t','డ':'d','ణ':'n','త':'t','ద':'d','న':'n','ప':'p','ఫ':'f','బ':'b','భ':'bh','మ':'m','య':'y','ర':'r','ల':'l','వ':'v','శ':'sh','ష':'sh','స':'s','హ':'h'},
+    kn:{'ಅ':'a','ಆ':'aa','ಇ':'i','ಈ':'ee','ಉ':'u','ಊ':'oo','ಎ':'e','ಏ':'e','ಐ':'ai','ಒ':'o','ಓ':'o','ಔ':'au','ಕ':'k','ಖ':'kh','ಗ':'g','ಘ':'gh','ಚ':'ch','ಜ':'j','ಟ':'t','ಡ':'d','ಣ':'n','ತ':'t','ದ':'d','ನ':'n','ಪ':'p','ಫ':'f','ಬ':'b','ಭ':'bh','ಮ':'m','ಯ':'y','ರ':'r','ಲ':'l','ವ':'v','ಶ':'sh','ಷ':'sh','ಸ':'s','ಹ':'h'},
+    ml:{'അ':'a','ആ':'aa','ഇ':'i','ഈ':'ee','ഉ':'u','ഊ':'oo','എ':'e','ഏ':'e','ഐ':'ai','ഒ':'o','ഓ':'o','ഔ':'au','ക':'k','ഖ':'kh','ഗ':'g','ഘ':'gh','ച':'ch','ജ':'j','ട':'t','ഡ':'d','ണ':'n','ത':'t','ദ':'d','ന':'n','പ':'p','ഫ':'ph','ബ':'b','ഭ':'bh','മ':'m','യ':'y','ര':'r','ല':'l','വ':'v','ശ':'sh','ഷ':'sh','സ':'s','ഹ':'h'}
+  };
+  const map=maps[lang];
+  if(map)return tidyRoman([...text].map(c=>map[c]??c).join(''));
+  return text;
+}
+
+function localRomanize(text,lang){
+  return romanizeIndic(text,lang);
+}
+
+function tidyRoman(text){
+  return String(text)
+    .replace(/\s+/g,' ')
+    .replace(/a([ \n.,!?])/g,'$1')
+    .replace(/\s+([,!?])/g,'$1')
+    .replace(/([a-z])\1{2,}/gi,'$1$1');
+}
+
+
+function detectLyricsLanguage(text){
+  if(/[\u0900-\u097F]/.test(text))return 'hi';
+  if(/[\u0980-\u09FF]/.test(text))return 'bn';
+  if(/[\u0A00-\u0A7F]/.test(text))return 'pa';
+  if(/[\u0B80-\u0BFF]/.test(text))return 'ta';
+  if(/[\u0C00-\u0C7F]/.test(text))return 'te';
+  if(/[\u0C80-\u0CFF]/.test(text))return 'kn';
+  if(/[\u0D00-\u0D7F]/.test(text))return 'ml';
+  return 'en';
+}
+
+function renderSelectedLyrics(){
+  if(!currentLyricsData)return;
+  const data=currentLyricsData;
+  const source=data.plainLyrics||cleanSyncedLyrics(data.syncedLyrics||'');
+  if(selectedLyricsMode==='original'){
+    if(data.syncedLyrics)renderSyncedLyrics(data.syncedLyrics);
+    else renderPlainLyrics(source);
+    return;
+  }
+  if(selectedLyricsMode==='roman'){
+    const lang=detectLyricsLanguage(source);
+    renderPlainLyrics(localRomanize(source,lang));
+    return;
+  }
+  // Translation is not silently faked. It needs a translation service.
+  renderPlainLyrics(source);
+  statusEl.textContent='English translation needs a translation API; Original and English-letters modes are available.';
+}
+
+function parseSyncedLyrics(lrc){
+  return String(lrc||'').split(/\r?\n/).flatMap(line=>{
+    const times=[...line.matchAll(/\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g)];
+    const text=line.replace(/\[(\d{1,3}):(\d{2})(?:[.:](\d{1,3}))?\]/g,'').trim();
+    if(!times.length || !text)return [];
+    return times.map(m=>{
+      const minutes=Number(m[1]);
+      const seconds=Number(m[2]);
+      const fraction=m[3]?Number(`0.${String(m[3]).padEnd(3,'0')}`):0;
+      return {time:minutes*60+seconds+fraction,text};
+    });
+  }).sort((a,b)=>a.time-b.time);
+}
+
+function renderSyncedLyrics(lrc){
+  syncedLines=parseSyncedLyrics(lrc);
+  if(!syncedLines.length){
+    renderPlainLyrics(cleanSyncedLyrics(lrc));
+    return;
+  }
+  lyricsEl.innerHTML=syncedLines.map((line,i)=>
+    `<button type="button" class="lyric-line" data-line="${i}">${escapeHtml(line.text)}</button>`
+  ).join('');
+
+  lyricsEl.querySelectorAll('.lyric-line').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const i=Number(btn.dataset.line);
+      seekYouTubeTo(syncedLines[i]?.time||0);
+      highlightLyric(i,true);
+    });
+  });
+}
+
+function renderPlainLyrics(text){
+  lyricsEl.innerHTML=String(text||'')
+    .split(/\r?\n/)
+    .map(line=>`<div class="plain-line">${escapeHtml(line)||'&nbsp;'}</div>`)
+    .join('');
+}
+
+function highlightLyric(index,manual=false){
+  const lines=lyricsEl.querySelectorAll('.lyric-line');
+  if(!lines.length)return;
+  lines.forEach((el,i)=>el.classList.toggle('current',i===index));
+  const current=lines[index];
+  if(current && (manual || !userLyricsScroll)){
+    current.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+
+function startLyricsSync(){
+  stopLyricsSync();
+  if(!syncedLines.length)return;
+  syncTimer=setInterval(updateLyricsFromPlayer,100);
+}
+
+function stopLyricsSync(){
+  if(syncTimer){clearInterval(syncTimer);syncTimer=null;}
+}
+
+function getYouTubePlayer(){
+  const frame=document.getElementById('youtubePlayer');
+  if(!frame || !frame.classList.contains('ready'))return null;
+  return window.songsworldYTPlayer||null;
+}
+
+function updateLyricsFromPlayer(){
+  const player=getYouTubePlayer();
+  if(!player || typeof player.getCurrentTime!=='function')return;
+  let time=0;
+  try{time=player.getCurrentTime()||0}catch(e){return;}
+
+  let active=-1;
+  for(let i=0;i<syncedLines.length;i++){
+    if(syncedLines[i].time<=time)active=i;
+    else break;
+  }
+  if(active>=0)highlightLyric(active,false);
+}
+
+function seekYouTubeTo(seconds){
+  const player=getYouTubePlayer();
+  if(player && typeof player.seekTo==='function'){
+    try{player.seekTo(seconds,true);player.playVideo?.();}catch(e){}
+  }
+}
+
+function loadYouTubeAPI(){
+  if(window.YT && window.YT.Player){createYouTubePlayer();return;}
+  if(document.getElementById('youtube-iframe-api'))return;
+  const script=document.createElement('script');
+  script.id='youtube-iframe-api';
+  script.src='https://www.youtube.com/iframe_api';
+  document.head.appendChild(script);
+}
+
+window.onYouTubeIframeAPIReady=()=>createYouTubePlayer();
+
+function createYouTubePlayer(){
+  const frame=document.getElementById('youtubePlayer');
+  if(!frame || !window.YT)return;
+
+  const old=window.songsworldYTPlayer;
+  try{old?.destroy()}catch(e){}
+
+  window.songsworldYTPlayer=new YT.Player('youtubePlayer',{
+    events:{
+      onReady:()=>updateLyricsFromPlayer(),
+      onStateChange:(event)=>{
+        if(event.data===1)startLyricsSync();
+        else if(event.data===2)stopLyricsSync();
+      }
+    }
+  });
+}
+
+function prepareYouTubeForSync(){
+  // The search-list embed must be converted into the IFrame API player.
+  loadYouTubeAPI();
+}
+
+function cleanSyncedLyrics(lrc){
+  return String(lrc||'')
+    // Remove every standard LRC timestamp, including multiple timestamps on one line.
+    .replace(/\[(?:\d{1,3}:)?\d{1,2}:\d{2}(?:[.:]\d{1,3})?\]/g,'')
+    // Remove common metadata tags if present.
+    .replace(/^\[(?:ar|ti|al|by|offset|re|ve):.*?\]\s*$/gim,'')
+    .split(/\\r?\\n/)
+    .map(line=>line.trim())
+    .filter((line,i,arr)=>line || (i>0 && arr[i-1]))
+    .join('\n')
+    .trim();
+}
+
+function stripLrc(lrc){
+  return cleanSyncedLyrics(lrc);
+}
+
+input.addEventListener('input',()=>showSuggestions(input.value));
+input.addEventListener('focus',()=>{if(input.value.trim())showSuggestions(input.value)});
+document.addEventListener('click',e=>{
+  if(!e.target.closest('.search-wrap'))hideSuggestions();
+});
+
+document.getElementById('syncNow')?.addEventListener('click',()=>{
+  userLyricsScroll=false;
+  updateLyricsFromPlayer();
+});
+
+document.getElementById('lyricsLanguage')?.addEventListener('change',async e=>{
+  selectedLyricsMode=e.target.value;
+  if(currentLyricsData)renderLyricsInSelectedLanguage(currentLyricsData);
+});
+
+lyricsEl.addEventListener('scroll',()=>{
+  userLyricsScroll=true;
+  clearTimeout(window._lyricsScrollTimer);
+  window._lyricsScrollTimer=setTimeout(()=>{userLyricsScroll=false;},1800);
+});
+
+form.addEventListener('submit',e=>{
+  e.preventDefault();
+  const q=input.value.trim();
+  if(q)searchSong(q);
+});
+
+</script>
+</body>
+</html>
