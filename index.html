@@ -27,7 +27,7 @@ const $=id=>document.getElementById(id);
 const WORKER="https://songsworld.khalidhasanmolla38.workers.dev";
 
 let results=[],current=null,lyricsData=null,lines=[],timer=null,mode="original";
-let ytPlayer=null,ytVideoId=null,previewAudio=null,ytCandidates=[],ytIndex=0;
+let ytPlayer=null,ytVideoId=null,previewAudio=null,ytCandidates=[],ytIndex=0;\nlet syncOffset=0;
 const cache=new Map();
 const KEYS={lib:"sw_library_v2",hist:"sw_history_v2"};
 
@@ -276,7 +276,7 @@ function updateLyricsFromYouTube(){
 
   if(time===null || !lines.length) return;
 
-  const index=findLyricIndex(time);
+  const index=findLyricIndex(time + syncOffset);
 
   if(index>=0){
     highlight(index,false);
@@ -484,7 +484,7 @@ async function openSong(index,push=true){
  $("artist").textContent=song.artistName;
  $("status").textContent="Loading lyrics…";
  $("lyrics").innerHTML='<div class="empty">Loading lyrics…</div>';
- $("mode").value="original";mode="original";lyricsData=null;lines=[];activeLyricIndex=-1;stopSync();
+ $("mode").value="original";mode="original";lyricsData=null;lines=[];activeLyricIndex=-1;syncOffset=0;stopSync();
 
  await Promise.allSettled([loadYouTube(song),loadLyrics(song)]);
  renderHome();
@@ -560,6 +560,40 @@ function showHome(push=true){
   if(push)pushAppState("home");
 }
 
+
+/* ===== LYRICS SYNC OFFSET ===== */
+function setSyncOffset(value){
+  syncOffset=Math.max(-15,Math.min(15,Number(value)||0));
+  const el=$("offsetValue");
+  if(el)el.textContent=(syncOffset>0?"+":"")+syncOffset.toFixed(1)+"s";
+  activeLyricIndex=-1;
+  updateLyricsFromYouTube();
+}
+
+function addSyncControls(){
+  if(document.getElementById("syncOffsetControl"))return;
+
+  const syncButton=$("sync");
+  if(!syncButton)return;
+
+  const box=document.createElement("div");
+  box.id="syncOffsetControl";
+  box.style.cssText="display:flex;align-items:center;gap:7px;margin:8px 0;font-size:13px;";
+
+  box.innerHTML=`
+    <button id="offsetMinus" type="button">−0.5s</button>
+    <span>Offset: <b id="offsetValue">0.0s</b></span>
+    <button id="offsetPlus" type="button">+0.5s</button>
+    <button id="offsetReset" type="button">Reset</button>
+  `;
+
+  syncButton.parentNode.insertBefore(box,syncButton);
+
+  $("offsetMinus").onclick=()=>setSyncOffset(syncOffset-0.5);
+  $("offsetPlus").onclick=()=>setSyncOffset(syncOffset+0.5);
+  $("offsetReset").onclick=()=>setSyncOffset(0);
+}
+
 $("go").onclick=async()=>{
  const q=$("q").value.trim();if(!q)return;
  $("go").textContent="SEARCHING…";
@@ -586,6 +620,7 @@ $("close").onclick=()=>{$("modal").style.display="none"};
 $("google").onclick=()=>alert("Google OAuth needs a Client ID and redirect configuration first.");
 
 renderHome();
+addSyncControls();
 loadTrending();
 </script>
 </body>
